@@ -1,0 +1,74 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="token-filter-behavior.html">
+
+<!--
+The `token-filter` element.
+
+@demo demo/index.html
+-->
+
+<script>
+(function() {
+  'use strict';
+  Polymer({
+
+    is: 'token-filter',
+  
+    behaviors: [
+      Polymer.TokenFilterBehavior
+    ],
+
+    properties: {
+
+      filter: {
+        type: String,
+        value: undefined
+      },
+
+      arrayToFilter: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
+
+      filteredArray: {
+        type: Array,
+        readOnly: true,
+        notify: true
+      },
+
+      filterMinLength: {
+        type: Number,
+        value: 2
+      },
+
+      filterMaxDepth: {
+        type: Number,
+        value: 1
+      },
+
+      filterDebounceDelay: {
+        type: Number,
+        value: 250
+      }
+    },
+
+    observers: [
+      '_filter(filter, arrayToFilter, filterMinLength, filterTokenizerRegExp, filterMaxDepth, filterDebounceDelay)'
+    ],
+
+    listeners: {
+      'filter-complete': '_filterCompleted'
+    },
+
+    _filter: function(filter, arrayToFilter, filterMinLength, filterTokenizerRegExp, filterMaxDepth, filterDebounceDelay) {
+      this.filterArray(filter, arrayToFilter, filterMinLength, filterTokenizerRegExp, filterMaxDepth, filterDebounceDelay);
+    },
+
+    _filterCompleted: function(e) {
+      this._setFilteredArray(e.detail);
+    }
+  });
+})();
+</script>

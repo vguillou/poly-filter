@@ -1,0 +1,38 @@
+{
+  "name": "token-filter",
+  "version": "0.0.1",
+  "authors": [
+    "Vincent Guillou <vin.guillou@gmail.com>"
+  ],
+  "description": "An Element and a Behavior to implement powerfull and intuitive client side filtering of collections.",
+  "keywords": [
+    "filter",
+    "token",
+    "search",
+    "web-components",
+    "web-component",
+    "web components",
+    "web component",
+    "polymer"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "res",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vguillou/token-filter.git"
+  },
+  "homepage": "https://vguillou.github.io/webcomponents/token-filter",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.3"
+  },
+  "devDependencies": {
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.5"
+  }
+}
