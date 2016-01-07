@@ -33,6 +33,7 @@
     "polymer": "Polymer/polymer#^1.2.3"
   },
   "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.9",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.5"
   }
 }
