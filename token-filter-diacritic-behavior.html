@@ -1,0 +1,28 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="token-filter-behavior.html">
+<script src="../js-replace-diacritics/replace-diacritics.js"></script>
+
+<script>
+(function() {
+  'use strict';
+
+  /**
+   * `Polymer.TokenFilterDiacriticBehavior` adds diacritics removal to `Polymer.TokenFilterBehavior`
+   *
+   * @polymerBehavior Polymer.TokenFilterDiacriticBehavior
+   */
+  Polymer.TokenFilterDiacriticBehaviorImpl = {
+
+    _processToken: function(token) {
+      return replaceDiacritics(token).trim();
+    }
+
+  };
+
+  /** @polymerBehavior Polymer.TokenFilterDiacriticBehavior */
+  Polymer.TokenFilterDiacriticBehavior = [
+    Polymer.TokenFilterBehavior,
+    Polymer.TokenFilterDiacriticBehaviorImpl
+  ];
+})();
+</script>

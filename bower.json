@@ -1,10 +1,10 @@
 {
   "name": "token-filter",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "authors": [
     "Vincent Guillou <vin.guillou@gmail.com>"
   ],
-  "description": "An Element and a Behavior to implement powerfull and intuitive client side filtering of collections.",
+  "description": "A fast, powerfull, and intuitive solution for client side filtering of arrays.",
   "keywords": [
     "filter",
     "token",
@@ -30,7 +30,8 @@
   },
   "homepage": "https://vguillou.github.io/webcomponents/token-filter",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.2.3"
+    "polymer": "Polymer/polymer#^1.2.3",
+    "js-replace-diacritics": "yvg/js-replace-diacritics#master"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.9",

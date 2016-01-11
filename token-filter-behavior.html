@@ -4,81 +4,240 @@
 (function() {
   'use strict';
   /**
-   * `Polymer.TokenFilterBehavior` if a helper behavior to implement
-   * powerfull and intuitive client side filtering of collections.
+   * `Polymer.TokenFilterBehavior` is a behavior implementing fast,
+   * powerfull, and intuitive client side filtering of items.
+   *
    * @polymerBehavior Polymer.TokenFilterBehavior
    */
-  Polymer.TokenFilterBehavior = [{
+  Polymer.TokenFilterBehavior = {
 
     properties: {
+
+      /**
+       * Array ot items (Object or not) to filter.
+       */
+      arrayToFilter: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
+
+      /**
+       * Tokenized and flattened `arrayToFilter` to boost filtering performance.
+       */
+      _processedArray: {
+        type: Array,
+        computed: '_processArray(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords)'
+      },
+
+      /**
+       * The output : All the items of `arrayToFilter` that survived filtering.
+       */
+      filteredArray: {
+        type: Array,
+        readOnly: true,
+        notify: true
+      },
+
+      /**
+       * The String used to filter the collection of items `arrayToFilter`.
+       */
+      filter: {
+        type: String,
+        value: ''
+      },
+
+      /**
+       * Minimum length of the `filter` String to be taken into account.
+       */
+      filterMinLength: {
+        type: Number,
+        value: 2
+      },
+
+      /**
+       * Debounce delay (in `ms`) before filtering when the `filter` String is changed.
+       */
+      filterDebounceDelay: {
+        type: Number,
+        value: 200
+      },
+
+      /**
+       * List of the item's properties to take into account for the filtering.
+       * If empty, item's in `arrayToFilter` will be filtered based on ``all`` their properties.
+       *
+       * Example:
+       * If the items in `arrayToFilter` represents countries with these properties :
+       *     
+       *     {'code': 'FR', 'name': 'France', 'language': 'French'}
+       *     
+       * and you only want to filter your array based on the `name' and `code`, you must set
+       * `itemPropertiesToFilter` to :
+       *     
+       *     ['code', 'name']
+       */
+      itemPropertiesToFilter: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
+
+      /**
+       * Maximum depth (number) of sub-properties in items of `arrayToFilter` to consider
+       * when filtering.
+       *
+       * Example:
+       * If the items in `arrayToFilter` are objet like these :
+       *     
+       *     {'level_1_prop':
+       *       {'level_2_prop':
+       *         {'level_3_prop':
+       *           {'level_4_prop': 'hello world'}}}}
+       *     
+       * and `filterMaxDepth` is set to `2`, the `level_3_prop` and `level_4_prop`
+       * will never be inspected during filtering.
+       */
+      filterMaxDepth: {
+        type: Number,
+        value: 1
+      },
+
+      /**
+       * RegExp used to tokenize `filter` and each properties of the items
+       * to filter (`arrayToFilter`).
+       * @type {RegExp}
+       */
       filterTokenizerRegExp: {
         type: RegExp,
         value: function() {
-          return new RegExp('[.?!,\\/ |-]', 'g');
+          return /[.?!,\\/ |-]/ig;
+        }
+      },
+
+      /**
+       * Array of words that should be ignored during the filtering process.
+       */
+      stopWords: {
+        type: Array,
+        value: function() {
+          return [];
         }
       }
     },
-    
-    /**
-     * Filtering method.
-     *
-     * @param {string} filter The string used as a base to filter the collection of items.
-     * @param {array} arrayToFilter The collection (array) of items to filter.
-     * @param {number} filterMinLength Minimum length of the `filter` to filter the collection (2 char by default).
-     * @param {RegExp} filterTokenizerRegExp RegExp used to tokenize `filter` and each properties of the items to filter (`arrayToFilter`) (new RegExp('[.?!,\\/ |-]', 'g') by default).
-     * @param {number} filterMaxDepth Filtering depth in the item properties (1 by default, direct child objects only).
-     * @param {number} filterDebounceDelay Minimum delay between each filtering (250ms by default).
-     */
-    filterArray: function(filter, arrayToFilter, filterMinLength, filterTokenizerRegExp, filterMaxDepth, filterDebounceDelay) {
-      this.debounce('filterArray' + this.localName, function() {
-        var fullFilter = (filter + '').toLowerCase();
-        var tokenizer = filterTokenizerRegExp || this.filterTokenizerRegExp;
-        var filterTokens = fullFilter.split(tokenizer);
-        var filterTokensArray;
-        if (!arrayToFilter) {
-          this.fire('filter-complete', arrayToFilter);
+
+    observers: [
+      '_generateFilteredArray(filter, _processedArray, filterMinLength, filterDebounceDelay)'
+    ],
+
+    _generateFilteredArray: function(filter, _processedArray, filterMinLength, filterDebounceDelay) {
+      if (!this.filterTokenizerRegExp) {
+        throw 'filterTokenizerRegExp must not be undefined';
+      }
+      this.stopWords = this.stopWords || [];
+
+      this.debounce('_generateFilteredArray' + this.localName, function() {
+        console.time('filter ' + filter);
+        if (filter && filter.length >= (filterMinLength || 2)) {
+          var filterTokens = this._processValue(filter, this.filterTokenizerRegExp, this.stopWords);
+          var itemTokens;
+
+          this._setFilteredArray(this.arrayToFilter.filter(function(obj, i) {
+            itemTokens = _processedArray[i];
+            return filterTokens.every(function(filterToken) {
+              return itemTokens.some(function(value) {
+                return value.startsWith(filterToken);
+              });
+            });
+          }));
         } else {
-          this.fire('filter-complete', arrayToFilter.filter(function(obj) {
-            if (!filterTokens.length || fullFilter.length < (filterMinLength || 2)) {
-              return true;
-            }
-            filterTokensArray = filterTokens.slice();
-            return this._searchObject(obj, filterTokensArray, tokenizer, 0, (typeof maxDepth !== 'undefined' ? maxDepth : 1));
-          }, this));
+          this._setFilteredArray(this.arrayToFilter);
         }
-      }, filterDebounceDelay || 250);
+        console.timeEnd('filter ' + filter);
+      }, !isNaN(filterDebounceDelay) && filterDebounceDelay > -1 ? filterDebounceDelay : 200);
     },
 
-    /**
-     * Handle the search of tokens for an object.
-     */
-    _searchObject: function(obj, filterTokensArray, filterTokenizerRegExp, depth, maxDepth) {
-      if ((typeof obj === 'string' || typeof obj === 'number')) {
-        this._removeTokensFoundInString('' + obj, filterTokensArray, filterTokenizerRegExp);
-        if (!filterTokensArray.length) {
-          return true;
-        }
-      } else if ((typeof obj === 'object' || typeof obj === 'array') && depth <= maxDepth) {
-        for (var propName in obj) {
-          return this._searchObject(obj[propName], filterTokensArray, filterTokenizerRegExp, depth+1, maxDepth);
+    _processArray: function(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords) {
+      console.time('processArray');
+      if (!filterTokenizerRegExp) {
+        throw 'filterTokenizerRegExp must not be undefined';
+      }
+      if (!(filterMaxDepth > -1)) {
+        throw 'filterMaxDepth (' + filterMaxDepth + ') must be a valid number >= 0';
+      }
+      itemPropertiesToFilter = itemPropertiesToFilter || [];
+      stopWords = stopWords || [];
+      
+      var result = [];
+      if (arrayToFilter) {
+        for (var i = 0, l = arrayToFilter.length; i < l; i++) {
+          var item = arrayToFilter[i];
+          if (item) {
+            result.push(this._processItem(item, itemPropertiesToFilter, filterTokenizerRegExp, 0, filterMaxDepth, stopWords));
+          }
         }
       }
-      return false;
+      console.timeEnd('processArray');
+      return result;
     },
 
-    /**
-     * Search for tokens in a given string, and removes those found.
-     */
-    _removeTokensFoundInString: function(str, tokensArray, filterTokenizerRegExp) {
-      var tokenizedStr = str.toLowerCase().split(filterTokenizerRegExp);
-      tokensArray.forEach(function(currentToken, currentTokenIndex, targetArray) {
-        if (!currentToken || !currentToken.trim().length || tokenizedStr.some(function(strToken) {
-          return strToken && strToken.length && strToken.startsWith(currentToken);
-        })) {
-          targetArray.splice(currentTokenIndex, 1);
+    _processItem: function(item, itemPropertiesToFilter, filterTokenizerRegExp, depth, filterMaxDepth, stopWords) {
+      if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+        return this._processValue(item, filterTokenizerRegExp, stopWords);
+      } else {
+        var flattenedItemTokens = [];
+        if (item) {
+          if (item.constructor === Array) {
+            for (var i = 0, l = item.length; i < l; i++) {
+              flattenedItemTokens = this._concat(flattenedItemTokens, this._processItem(item[i], itemPropertiesToFilter, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
+            }
+          }
+          else if (depth <= filterMaxDepth) {
+            var filterAllProps = !itemPropertiesToFilter || !itemPropertiesToFilter.length;
+            for (var propName in item) {
+              if (!filterAllProps && itemPropertiesToFilter.indexOf(propName) < 0) {
+                continue;
+              } else {
+                flattenedItemTokens = this._concat(flattenedItemTokens, this._processItem(item[propName], itemPropertiesToFilter, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
+              }
+            }
+          }
         }
-      });
+        return flattenedItemTokens;
+      }
+    },
+
+    _processValue: function(value, filterTokenizerRegExp, stopWords) {
+      // Safety checks
+      if (value === undefined || value === null || (value === NaN)) {
+        return undefined;
+      }
+      // Split value into tokens
+      var tokens = ('' + value).toLowerCase().split(filterTokenizerRegExp);
+      // Processing token, removing empty ones and stop words
+      var tt, me = this;
+      tokens = tokens.reduce(function(memo, t) {
+        tt = me._processToken(t);
+        if (tt && stopWords.indexOf(tt)) {
+          memo.push(tt);
+        }
+        return memo;
+      }, []);
+      return tokens;
+    },
+
+    _processToken: function(token) {
+      return token.trim();
+    },
+
+    _concat: function(dest, values) {
+      if (values) {
+        return dest.concat(values);
+      }
+      return dest;
     }
-  }];
+  };
 })();
 </script>

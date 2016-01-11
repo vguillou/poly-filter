@@ -1,0 +1,40 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="token-filter-diacritic-behavior.html">
+
+<!--
+A fast, powerfull, and intuitive solution for client side filtering of items, that ignores diacritics.
+
+Example:
+
+    <token-filter-diacritic
+      filter="[[myFilterOrQueryToSearchFor]]"
+      array-to-filter="[[myArrayToFilter]]"
+      filtered-array="{{myArrayAfterItWasFiltered}}"
+      stop-words="[[arrayOfWordsToIgnore]]">
+   </token-filter-diacritic>
+
+### Notes
+
+If you are developing your own Polymer web-component with a filtering/searching functionality,
+consider using the `token-filter-diacritic-behavior` directly for maximum performances.
+
+If you do not need to ignore accents (for example if you only deal with english language),
+you should use `token-filter` or `token-filter-behavior` for maximum performances.
+
+@group token-filter
+@element token-filter-diacritic
+@demo demo/index.html
+-->
+<script>
+(function() {
+  'use strict';
+  Polymer({
+
+    is: 'token-filter-diacritic',
+  
+    behaviors: [
+      Polymer.TokenFilterDiacriticBehavior
+    ]
+  });
+})();
+</script>

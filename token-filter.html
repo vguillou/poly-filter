@@ -2,11 +2,29 @@
 <link rel="import" href="token-filter-behavior.html">
 
 <!--
-The `token-filter` element. WIP!
+A fast, powerfull, and intuitive solution for client side filtering of arrays.
 
+Example:
+
+    <token-filter
+      filter="[[myFilterOrQueryToSearchFor]]"
+      array-to-filter="[[myArrayToFilter]]"
+      filtered-array="{{myArrayAfterItWasFiltered}}"
+      stop-words="[[arrayOfWordsToIgnore]]">
+   </token-filter>
+
+### Notes
+
+If you are developing your own Polymer web-component with a filtering/searching functionality,
+consider using the `token-filter-behavior` directly for maximum performances.
+
+If you want your filter/search to ignore accents and other character modifiers,
+use `token-filter-diacritic` or `token-filter-diacritic-behavior` instead.
+
+@group token-filter
+@element token-filter
 @demo demo/index.html
 -->
-
 <script>
 (function() {
   'use strict';
@@ -16,59 +34,7 @@ The `token-filter` element. WIP!
   
     behaviors: [
       Polymer.TokenFilterBehavior
-    ],
-
-    properties: {
-
-      filter: {
-        type: String,
-        value: undefined
-      },
-
-      arrayToFilter: {
-        type: Array,
-        value: function() {
-          return [];
-        }
-      },
-
-      filteredArray: {
-        type: Array,
-        readOnly: true,
-        notify: true
-      },
-
-      filterMinLength: {
-        type: Number,
-        value: 2
-      },
-
-      filterMaxDepth: {
-        type: Number,
-        value: 1
-      },
-
-      filterDebounceDelay: {
-        type: Number,
-        value: 250
-      }
-    },
-
-    observers: [
-      '_filter(filter, arrayToFilter, filterMinLength, filterTokenizerRegExp, filterMaxDepth, filterDebounceDelay)'
-    ],
-
-    listeners: {
-      'filter-complete': '_filterCompleted'
-    },
-
-    _filter: function(filter, arrayToFilter, filterMinLength, filterTokenizerRegExp, filterMaxDepth, filterDebounceDelay) {
-      this.filterArray(filter, arrayToFilter, filterMinLength, filterTokenizerRegExp, filterMaxDepth, filterDebounceDelay);
-    },
-
-    _filterCompleted: function(e) {
-      this._setFilteredArray(e.detail);
-    }
+    ]
   });
 })();
 </script>
