@@ -35,7 +35,15 @@
 
   <template is="dom-bind" id="demo">
 
-    <!--<token-filter filter="[[filterString]]" array-to-filter="[[countries]]" filtered-array="{{filteredCountries}}" item-properties-to-filter="[[filterProperties]]" filter-max-depth="1" stop-words="[[stopWords]]"></token-filter>-->
+    <!--<token-filter
+      filter="[[filterString]]"
+      array-to-filter="[[countries]]"
+      filtered-array="{{filteredCountries}}"
+      item-properties-to-filter="[[filterProperties]]"
+      filter-max-depth="1"
+      stop-words="[[stopWords]]"
+      logical-or="or">
+    </token-filter>-->
 
     <token-filter-diacritic
       filter="[[filterString]]"
@@ -43,7 +51,8 @@
       filtered-array="{{filteredCountries}}"
       item-properties-to-filter="[[filterProperties]]"
       filter-max-depth="1"
-      stop-words="[[stopWords]]">
+      stop-words="[[stopWords]]"
+      logical-or="or">
    </token-filter-diacritic>
 
     <div class="vertical layout">
@@ -62,7 +71,7 @@
     var demo = document.querySelector('#demo');
     demo.filterProperties = ['code', 'name'];
     demo.countries = [
-      {'code':'AF', 'name':'★Lorém ïpsum dölor.'},
+      {'code':'AF', 'name':'Afghanistan'},
       {'code':'AL', 'name':'Albania'},
       {'code':'DZ', 'name':'Algeria'},
       {'code':'AS', 'name':'American Samoa'},
@@ -85,7 +94,7 @@
       {'code':'BE', 'name':'Belgium'},
       {'code':'BZ', 'name':'Belize'},
       {'code':'BJ', 'name':'Benin'},
-      {'code':'BM', 'name':'Bermuda·'},
+      {'code':'BM', 'name':'Bermuda'},
       {'code':'BT', 'name':'Bhutan'},
       {'code':'BO', 'name':'Bolivia'},
       {'code':'BA', 'name':'Bosnia And Herzegovina'},
@@ -323,7 +332,7 @@
       'and',
       'any',
       'are',
-      'aren\·t',
+      'aren\'t',
       'as',
       'at',
       'be',

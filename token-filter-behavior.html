@@ -125,42 +125,61 @@
         value: function() {
           return [];
         }
+      },
+
+      /**
+       * Case insensitive Logical OR operator.
+       *
+       * Example:
+       * If the logical OR operator is set to 'or' and the `filter` is 'united ki or swed',
+       * then a filtered country list will retain both 'United Kingdom' and 'Sweden'.
+       */
+      logicalOr: {
+        type: String,
+        value: 'or'
       }
     },
 
     observers: [
-      '_generateFilteredArray(filter, _processedArray, filterMinLength, filterDebounceDelay)'
+      '_generateFilteredArray(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr)'
     ],
 
-    _generateFilteredArray: function(filter, _processedArray, filterMinLength, filterDebounceDelay) {
+    _generateFilteredArray: function(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr) {
       if (!this.filterTokenizerRegExp) {
         throw 'filterTokenizerRegExp must not be undefined';
       }
       this.stopWords = this.stopWords || [];
 
       this.debounce('_generateFilteredArray' + this.localName, function() {
-        console.time('filter ' + filter);
+        //console.time('_generateFilteredArray ' + filter);
         if (filter && filter.length >= (filterMinLength || 2)) {
-          var filterTokens = this._processValue(filter, this.filterTokenizerRegExp, this.stopWords);
-          var itemTokens;
+          var result = [], filterTokens, itemTokens;
+          var filterParts = logicalOr ? filter.toLowerCase().split(logicalOr.toLowerCase()) : [filter];
+          for (var i = 0, l = filterParts.length; i < l; i++) {
+            if (filterParts[i].trim()) {
+              filterTokens = this._processValue(filterParts[i], this.filterTokenizerRegExp, this.stopWords);
 
-          this._setFilteredArray(this.arrayToFilter.filter(function(obj, i) {
-            itemTokens = _processedArray[i];
-            return filterTokens.every(function(filterToken) {
-              return itemTokens.some(function(value) {
-                return value.startsWith(filterToken);
-              });
-            });
-          }));
+              result = this._concat(result, this.arrayToFilter.filter(function(obj, j) {
+                itemTokens = _processedArray[j];
+                return filterTokens.every(function(filterToken) {
+
+                  return filterToken && itemTokens.some(function(value) {
+                    return value.startsWith(filterToken);
+                  });
+                });
+              }));
+            }
+          }
+          this._setFilteredArray(result);
         } else {
           this._setFilteredArray(this.arrayToFilter);
         }
-        console.timeEnd('filter ' + filter);
+        //console.timeEnd('_generateFilteredArray ' + filter);
       }, !isNaN(filterDebounceDelay) && filterDebounceDelay > -1 ? filterDebounceDelay : 200);
     },
 
     _processArray: function(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords) {
-      console.time('processArray');
+      //console.time('_processArray');
       if (!filterTokenizerRegExp) {
         throw 'filterTokenizerRegExp must not be undefined';
       }
@@ -179,7 +198,7 @@
           }
         }
       }
-      console.timeEnd('processArray');
+      //console.timeEnd('_processArray');
       return result;
     },
 
