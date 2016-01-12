@@ -131,7 +131,7 @@
        * Case insensitive Logical OR operator.
        *
        * Example:
-       * If the logical OR operator is set to 'or' and the `filter` is 'united ki or swed',
+       * If the logical OR operator is set to 'or' and the `filter` is 'united ki or wede',
        * then a filtered country list will retain both 'United Kingdom' and 'Sweden'.
        */
       logicalOr: {
@@ -153,23 +153,29 @@
       this.debounce('_generateFilteredArray' + this.localName, function() {
         //console.time('_generateFilteredArray ' + filter);
         if (filter && filter.length >= (filterMinLength || 2)) {
-          var result = [], filterTokens, itemTokens;
+          var result = [], itemTokens;
+          // Breaking the filter/query on the logical OR to produce all tokens
           var filterParts = logicalOr ? filter.toLowerCase().split(logicalOr.toLowerCase()) : [filter];
+          var filterPart, filterPartsTokens = [];
           for (var i = 0, l = filterParts.length; i < l; i++) {
-            if (filterParts[i].trim()) {
-              filterTokens = this._processValue(filterParts[i], this.filterTokenizerRegExp, this.stopWords);
-
-              result = this._concat(result, this.arrayToFilter.filter(function(obj, j) {
-                itemTokens = _processedArray[j];
-                return filterTokens.every(function(filterToken) {
-
-                  return filterToken && itemTokens.some(function(value) {
-                    return value.startsWith(filterToken);
-                  });
-                });
-              }));
+            filterPart = filterParts[i].trim();
+            if (filterPart) {
+              filterPartsTokens.push(this._processValue(filterPart, this.filterTokenizerRegExp, this.stopWords));
             }
           }
+          // Actual filtering process: Instead of directly filtering the `arrayToFilter`, we traverse
+          // the preprocessed `_processedArray` to speed things up considerably.
+          result = this._concat(result, this.arrayToFilter.filter(function(obj, j) {
+            itemTokens = _processedArray[j];
+            return filterPartsTokens.some(function(filterTokens) {
+              return filterTokens.every(function(token) {
+                return token && itemTokens.some(function(value) {
+                  return value.indexOf(token) > -1;
+                });
+              });
+            });
+          }));
+          // Setting the final result to the bindable property
           this._setFilteredArray(result);
         } else {
           this._setFilteredArray(this.arrayToFilter);
@@ -178,6 +184,10 @@
       }, !isNaN(filterDebounceDelay) && filterDebounceDelay > -1 ? filterDebounceDelay : 200);
     },
 
+    /**
+     * From a given `arrayToFilter`, produce a 'twin' array of by breaking specified
+     * item's properties into a flattened array of normalized tokens without stop-words.
+     */
     _processArray: function(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords) {
       //console.time('_processArray');
       if (!filterTokenizerRegExp) {
@@ -202,6 +212,10 @@
       return result;
     },
 
+    /**
+     * Break specified item's properties into a flattened array of
+     * normalized tokens without stop-words.
+     */
     _processItem: function(item, itemPropertiesToFilter, filterTokenizerRegExp, depth, filterMaxDepth, stopWords) {
       if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
         return this._processValue(item, filterTokenizerRegExp, stopWords);
@@ -228,6 +242,9 @@
       }
     },
 
+    /**
+     * Break a given value into normalized tokens without stop-words.
+     */
     _processValue: function(value, filterTokenizerRegExp, stopWords) {
       // Safety checks
       if (value === undefined || value === null || (value === NaN)) {
@@ -247,6 +264,9 @@
       return tokens;
     },
 
+    /**
+     * Normalize a token.
+     */
     _processToken: function(token) {
       return token.trim();
     },
