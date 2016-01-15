@@ -161,6 +161,9 @@
       '_generateFilteredArray(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr)'
     ],
 
+    /**
+     * Actual filtering function.
+     */
     _generateFilteredArray: function(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr) {
       if (!this.filterTokenizerRegExp) {
         throw 'filterTokenizerRegExp must not be undefined';
@@ -195,10 +198,9 @@
               })) {
                 result.push(this.arrayToFilter[j]);
               }
-              // Processed all items
               if (j + 1 === length) {
+                // All items processed, set the result
                 this._setFilteredArray(result);
-                //console.timeEnd('_generateFilteredArray ' + filter);
               }
               else if (j % this._batchProcessNumber === 0) {
                 this.async(process, 5);
@@ -217,7 +219,6 @@
      * item's properties into a flattened array of normalized tokens without stop-words.
      */
     _processArray: function(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords) {
-      //console.time('_processArray');
       if (!filterTokenizerRegExp) {
         throw 'filterTokenizerRegExp must not be undefined';
       }
@@ -230,16 +231,13 @@
         var result = [], item, i = 0, length = arrayToFilter.length;
         var process = function() {
           for (; i < length; i++) {
-           // console.log(i);
             item = arrayToFilter[i];
             if (item) {
               result.push(this._processItem(item, itemPropertiesToFilter, filterTokenizerRegExp, 0, filterMaxDepth, stopWords));
             }
-
-            // Processed all items
             if (i + 1 === length) {
+              // All items processed, set the result
               this._set_processedArray(result);
-              //console.timeEnd('_processArray');
             }
             else if (i % this._batchProcessNumber === 0) {
               this.async(process, 5);
@@ -309,6 +307,9 @@
       return token.trim();
     },
 
+    /**
+     * Safely concat two arrays.
+     */
     _concat: function(dest, values) {
       if (values) {
         return dest.concat(values);
