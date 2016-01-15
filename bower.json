@@ -5,10 +5,17 @@
     "Vincent Guillou <vin.guillou@gmail.com>"
   ],
   "description": "A fast, powerfull, and intuitive solution for client side filtering of arrays.",
+  "main": [
+    "token-filter.html",
+    "token-filter-diacritic.html",
+    "token-filter-behavior.html",
+    "token-filter-diacritic-behavior.html"
+  ],
   "keywords": [
     "filter",
     "token",
     "search",
+    "autocomplete",
     "web-components",
     "web-component",
     "web components",
@@ -34,7 +41,8 @@
     "js-replace-diacritics": "yvg/js-replace-diacritics#master"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^1.0.9",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.5"
+    "iron-component-page": "PolymerElements/iron-component-page#^1.1.4",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.2.2",
+    "iron-list": "PolymerElements/iron-list#^1.1.7"
   }
 }

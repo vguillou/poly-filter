@@ -28,7 +28,7 @@
        */
       _processedArray: {
         type: Array,
-        computed: '_processArray(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords)'
+        readOnly: true
       },
 
       /**
@@ -92,13 +92,18 @@
        * Example:
        * If the items in `arrayToFilter` are objet like these :
        *     
-       *     {'level_1_prop':
-       *       {'level_2_prop':
-       *         {'level_3_prop':
-       *           {'level_4_prop': 'hello world'}}}}
+       *     {'lastname': 'foo',
+       *      'job': 
+       *      {'title': 'bartender'
+       *       'company':
+       *       {'name': 'foobar',
+       *        'address': '1 foobar street'
+       *       }
+       *      }
+       *     }
        *     
-       * and `filterMaxDepth` is set to `2`, the `level_3_prop` and `level_4_prop`
-       * will never be inspected during filtering.
+       * and `filterMaxDepth` is set to `1`, the company's name and address
+       * can never be inspected during filtering, but the job title can be.
        */
       filterMaxDepth: {
         type: Number,
@@ -137,10 +142,22 @@
       logicalOr: {
         type: String,
         value: 'or'
+      },
+
+      /**
+       * Maximum number of items processed before the browser is given a chance to 'relax'.
+       * Increase this value for faster processing, but at the risk of freezing the browser.
+       * Decrease it if you deal with very large objects and the browser is freezing during
+       * filtering or pre-processing.
+       */
+      _batchProcessNumber: {
+        type: Number,
+        value: 50
       }
     },
 
     observers: [
+      '_processArray(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords)',
       '_generateFilteredArray(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr)'
     ],
 
@@ -153,7 +170,7 @@
       this.debounce('_generateFilteredArray' + this.localName, function() {
         //console.time('_generateFilteredArray ' + filter);
         if (filter && filter.length >= (filterMinLength || 2)) {
-          var result = [], itemTokens;
+          var result = [], itemTokens, j = 0, length = this.arrayToFilter.length;
           // Breaking the filter/query on the logical OR to produce all tokens
           var filterParts = logicalOr ? filter.toLowerCase().split(logicalOr.toLowerCase()) : [filter];
           var filterPart, filterPartsTokens = [];
@@ -163,24 +180,35 @@
               filterPartsTokens.push(this._processValue(filterPart, this.filterTokenizerRegExp, this.stopWords));
             }
           }
-          // Actual filtering process: Instead of directly filtering the `arrayToFilter`, we traverse
-          // the preprocessed `_processedArray` to speed things up considerably.
-          result = this._concat(result, this.arrayToFilter.filter(function(obj, j) {
-            itemTokens = _processedArray[j];
-            return filterPartsTokens.some(function(filterTokens) {
-              return filterTokens.every(function(token) {
-                return token && itemTokens.some(function(value) {
-                  return value.indexOf(token) > -1;
+
+          var process = function() {
+            for (; j < length; j++) {
+              // Actual filtering process: Instead of directly filtering the `arrayToFilter`, we traverse
+              // the preprocessed `_processedArray` to speed things up considerably.
+              itemTokens = _processedArray[j];
+              if (filterPartsTokens.some(function(filterTokens) {
+                return filterTokens.every(function(token) {
+                  return token && itemTokens.some(function(value) {
+                    return value.indexOf(token) > -1;
+                  });
                 });
-              });
-            });
-          }));
-          // Setting the final result to the bindable property
-          this._setFilteredArray(result);
+              })) {
+                result.push(this.arrayToFilter[j]);
+              }
+              // Processed all items
+              if (j + 1 === length) {
+                this._setFilteredArray(result);
+                //console.timeEnd('_generateFilteredArray ' + filter);
+              }
+              else if (j % this._batchProcessNumber === 0) {
+                this.async(process, 5);
+              }
+            }
+          }.bind(this);
+          process();
         } else {
           this._setFilteredArray(this.arrayToFilter);
         }
-        //console.timeEnd('_generateFilteredArray ' + filter);
       }, !isNaN(filterDebounceDelay) && filterDebounceDelay > -1 ? filterDebounceDelay : 200);
     },
 
@@ -198,18 +226,28 @@
       }
       itemPropertiesToFilter = itemPropertiesToFilter || [];
       stopWords = stopWords || [];
-      
-      var result = [];
       if (arrayToFilter) {
-        for (var i = 0, l = arrayToFilter.length; i < l; i++) {
-          var item = arrayToFilter[i];
-          if (item) {
-            result.push(this._processItem(item, itemPropertiesToFilter, filterTokenizerRegExp, 0, filterMaxDepth, stopWords));
+        var result = [], item, i = 0, length = arrayToFilter.length;
+        var process = function() {
+          for (; i < length; i++) {
+           // console.log(i);
+            item = arrayToFilter[i];
+            if (item) {
+              result.push(this._processItem(item, itemPropertiesToFilter, filterTokenizerRegExp, 0, filterMaxDepth, stopWords));
+            }
+
+            // Processed all items
+            if (i + 1 === length) {
+              this._set_processedArray(result);
+              //console.timeEnd('_processArray');
+            }
+            else if (i % this._batchProcessNumber === 0) {
+              this.async(process, 5);
+            }
           }
-        }
+        }.bind(this);
+        process();
       }
-      //console.timeEnd('_processArray');
-      return result;
     },
 
     /**

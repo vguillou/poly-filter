@@ -11,6 +11,7 @@
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+  <link rel="import" href="../../iron-list/iron-list.html">
   <link rel="import" href="../token-filter-diacritic.html">
   <link rel="import" href="../token-filter.html">
 
@@ -29,21 +30,15 @@
       margin: 10px;
       @apply(--layout-self-center);
     }
+    iron-list {
+      height: 500px;
+      border-style: solid;
+    }
   </style>
   
 <body unresolved>
 
   <template is="dom-bind" id="demo">
-
-    <!--<token-filter
-      filter="[[filterString]]"
-      array-to-filter="[[countries]]"
-      filtered-array="{{filteredCountries}}"
-      item-properties-to-filter="[[filterProperties]]"
-      filter-max-depth="1"
-      stop-words="[[stopWords]]"
-      logical-or="or">
-    </token-filter>-->
 
     <token-filter-diacritic
       filter="[[filterString]]"
@@ -58,10 +53,11 @@
     <div class="vertical layout">
 
       <span>Filter by country name only: <input type="string" value="{{filterString::input}}"></span>
-      
-      <template is="dom-repeat" items="{{filteredCountries}}">
-        <div>{{item.code}} - {{item.name}}</span></div>
-      </template>
+      <iron-list items="[[filteredCountries]]" as="country">
+        <template>
+          <span>[[country.code]] - [[country.name]]</span>
+        </template>
+      </iron-list>
 
     </div>
 
@@ -313,12 +309,6 @@
       {'code':'ZM', 'name':'Zambia'},
       {'code':'ZW', 'name':'Zimbabwe'}
     ];
-    /*demo.countries = [
-      'a string',
-      {'code': 'an object'},
-      ['an', 'array', 'to', 'test'],
-      {'prop': 'complexe object', 'name': {'obj': 'obj', 'code': {'code': 'toto', 'name': 'tata'}}, 'code': ['another', 'array', {'code': 'an object inside an array!'}]},
-    ];*/
     demo.stopWords = [
       'a',
       'about',
