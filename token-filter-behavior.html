@@ -94,7 +94,7 @@
        *     
        *     {'lastname': 'foo',
        *      'job': 
-       *      {'title': 'bartender'
+       *      {'title': 'bartender',
        *       'company':
        *       {'name': 'foobar',
        *        'address': '1 foobar street'
@@ -124,6 +124,7 @@
 
       /**
        * Array of words that should be ignored during the filtering process.
+       * All the stop-words MUST be in lower case.
        */
       stopWords: {
         type: Array,
@@ -292,7 +293,7 @@
       var tt, me = this;
       tokens = tokens.reduce(function(memo, t) {
         tt = me._processToken(t);
-        if (tt && stopWords.indexOf(tt)) {
+        if (tt && stopWords.indexOf(tt) < 0) {
           memo.push(tt);
         }
         return memo;
