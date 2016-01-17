@@ -1,29 +1,29 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="token-filter-behavior.html">
+<link rel="import" href="poly-filter-behavior.html">
 
 <!--
-A fast, powerfull, and intuitive solution for client side filtering of arrays.
+A fast and customizable solution for client side filtering of arrays, made with and for Polymer.
 
 Example:
 
-    <token-filter
+    <poly-filter
       filter="[[myFilterOrQueryToSearchFor]]"
       array-to-filter="[[myArrayToFilter]]"
       filtered-array="{{myArrayAfterItWasFiltered}}"
       stop-words="[[arrayOfWordsToIgnore]]"
       logical-or="or">
-   </token-filter>
+    </poly-filter>
 
 ### Notes
 
 If you are developing your own Polymer web-component with a filtering/searching functionality,
-consider using the `token-filter-behavior` directly for maximum performances.
+consider using the `poly-filter-behavior` directly for maximum performances.
 
 If you want your filter/search to ignore accents and other character modifiers,
-use `token-filter-diacritic` or `token-filter-diacritic-behavior` instead.
+use `poly-filter-diacritic` or `poly-filter-diacritic-behavior` instead.
 
-@group token-filter
-@element token-filter
+@group poly-filters
+@element poly-filter
 @demo demo/index.html
 -->
 <script>
@@ -31,10 +31,10 @@ use `token-filter-diacritic` or `token-filter-diacritic-behavior` instead.
   'use strict';
   Polymer({
 
-    is: 'token-filter',
+    is: 'poly-filter',
   
     behaviors: [
-      Polymer.TokenFilterBehavior
+      Polymer.PolyFilterBehavior
     ]
   });
 })();

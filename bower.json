@@ -1,15 +1,15 @@
 {
-  "name": "token-filter",
+  "name": "poly-filters",
   "version": "0.1.0",
   "authors": [
     "Vincent Guillou <vin.guillou@gmail.com>"
   ],
-  "description": "A fast, powerfull, and intuitive solution for client side filtering of arrays.",
+  "description": "A fast and customizable solution for client side filtering of arrays, made with and for Polymer.",
   "main": [
-    "token-filter.html",
-    "token-filter-diacritic.html",
-    "token-filter-behavior.html",
-    "token-filter-diacritic-behavior.html"
+    "poly-filter.html",
+    "poly-filter-diacritic.html",
+    "poly-filter-behavior.html",
+    "poly-filter-diacritic-behavior.html"
   ],
   "keywords": [
     "filter",
@@ -33,9 +33,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/vguillou/token-filter.git"
+    "url": "git://github.com/vguillou/poly-filters.git"
   },
-  "homepage": "https://vguillou.github.io/webcomponents/token-filter",
+  "homepage": "https://vguillou.github.io/webcomponents/poly-filters",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.3",
     "js-replace-diacritics": "yvg/js-replace-diacritics#master"

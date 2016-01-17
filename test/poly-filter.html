@@ -2,37 +2,37 @@
 <html>
 <head>
 
-  <title>token-filter</title>
+  <title>poly-filter</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script src="../../web-component-tester/browser.js"></script>
 
-  <link rel="import" href="../token-filter.html">
+  <link rel="import" href="../poly-filter.html">
 
 </head>
 <body>
 
-  <test-fixture id="BasicTokenFilter">
+  <test-fixture id="BasicPolyFilter">
     <template>
-      <token-filter
+      <poly-filter
         filter-max-depth="1">
-      </token-filter>
+      </poly-filter>
     </template>
   </test-fixture>
 
 <script>
 
-  suite('<token-filter>', function() {
+  suite('<poly-filter>', function() {
 
     suite('basic filtering', function () {
-      var tokenFilter;
+      var polyFilter;
 
       setup(function () {
-        tokenFilter = fixture('BasicTokenFilter');
-        tokenFilter.arrayToFilter = countries;
-        tokenFilter.filter = '';
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = countries;
+        polyFilter.filter = '';
       });
 
       teardown(function () {
@@ -40,95 +40,95 @@
 
       test('all items if no filter', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(241);
-          runStep(tokenFilter, step2);
-          tokenFilter.filter = 'bar';
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          runStep(polyFilter, step2);
+          polyFilter.filter = 'bar';
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(3);
-          runStep(tokenFilter, step3);
-          tokenFilter.filter = '';
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
+          runStep(polyFilter, step3);
+          polyFilter.filter = '';
         };
         var step3 = function(e) {
-          finishStep(tokenFilter, step3);
-          expect(tokenFilter.filteredArray.length).to.be.equal(241);
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
           done();
         };
 
-        runStep(tokenFilter, step1);
+        runStep(polyFilter, step1);
       });
 
       test('basic filtering', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(241);
-          runStep(tokenFilter, step2);
-          tokenFilter.filter = 'bar';
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          runStep(polyFilter, step2);
+          polyFilter.filter = 'bar';
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(3);
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
           done();
         };
 
-        runStep(tokenFilter, step1);
+        runStep(polyFilter, step1);
       });
 
       test('update filter', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(241);
-          runStep(tokenFilter, step2);
-          tokenFilter.filter = 'bar';
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          runStep(polyFilter, step2);
+          polyFilter.filter = 'bar';
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(3);
-          runStep(tokenFilter, step3);
-          tokenFilter.filter = 'uxe';
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
+          runStep(polyFilter, step3);
+          polyFilter.filter = 'uxe';
         };
         var step3 = function(e) {
-          finishStep(tokenFilter, step3);
-          expect(tokenFilter.filteredArray.length).to.be.equal(1);
-          expect(tokenFilter.filteredArray[0].code).to.be.equal('LU');
-          expect(tokenFilter.filteredArray[0].name).to.be.equal('Luxembourg');
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('LU');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Luxembourg');
           done();
         };
 
-        runStep(tokenFilter, step1);
+        runStep(polyFilter, step1);
       });
 
       test('filter length', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(241);
-          tokenFilter.filterMinLength = 4;
-          tokenFilter.filter = 'ant';
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          polyFilter.filterMinLength = 4;
+          polyFilter.filter = 'ant';
           setTimeout(function() {
-            expect(tokenFilter.filteredArray.length).to.be.equal(241);
-            runStep(tokenFilter, step2);
-            tokenFilter.filter = 'AntA';
+            expect(polyFilter.filteredArray.length).to.be.equal(241);
+            runStep(polyFilter, step2);
+            polyFilter.filter = 'AntA';
           }, 300);
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(1);
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
           done();
         };
 
-        runStep(tokenFilter, step1);
+        runStep(polyFilter, step1);
       });
     });
 
     suite('logical or', function () {
-      var tokenFilter;
+      var polyFilter;
 
       setup(function () {
-        tokenFilter = fixture('BasicTokenFilter');
-        tokenFilter.arrayToFilter = countries;
-        tokenFilter.filter = '';
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = countries;
+        polyFilter.filter = '';
       });
 
       teardown(function () {
@@ -136,41 +136,41 @@
 
       test('basic logical or', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(2);
-          expect(tokenFilter.filteredArray[0].code).to.be.equal('FR');
-          expect(tokenFilter.filteredArray[0].name).to.be.equal('France');
-          expect(tokenFilter.filteredArray[1].code).to.be.equal('SE');
-          expect(tokenFilter.filteredArray[1].name).to.be.equal('Sweden');
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(2);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('FR');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('France');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('SE');
+          expect(polyFilter.filteredArray[1].name).to.be.equal('Sweden');
           done();
         };
 
-        tokenFilter.logicalOr = '||';
-        tokenFilter.filter = 'france || sweden';
-        runStep(tokenFilter, step1);
+        polyFilter.logicalOr = '||';
+        polyFilter.filter = 'france || sweden';
+        runStep(polyFilter, step1);
       });
 
       test('logical or ignored without second member', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(1);
-          expect(tokenFilter.filteredArray[0].code).to.be.equal('CA');
-          expect(tokenFilter.filteredArray[0].name).to.be.equal('Canada');
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('CA');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Canada');
           done();
         };
 
-        tokenFilter.logicalOr = 'foobar';
-        tokenFilter.filter = 'canada foobar';
-        runStep(tokenFilter, step1);
+        polyFilter.logicalOr = 'foobar';
+        polyFilter.filter = 'canada foobar';
+        runStep(polyFilter, step1);
       });
     });
 
     suite('debounce delay', function () {
-      var tokenFilter;
+      var polyFilter;
 
       setup(function () {
-        tokenFilter = fixture('BasicTokenFilter');
-        tokenFilter.arrayToFilter = countries;
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = countries;
       });
 
       teardown(function () {
@@ -178,38 +178,38 @@
 
       test('basic debounce delay', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(241);
-          tokenFilter.filter = 'foo';
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          polyFilter.filter = 'foo';
           setTimeout(function() {
-            expect(tokenFilter.filteredArray.length).to.be.equal(241);
-            tokenFilter.filter = 'bar';
+            expect(polyFilter.filteredArray.length).to.be.equal(241);
+            polyFilter.filter = 'bar';
             setTimeout(function() {
-              expect(tokenFilter.filteredArray.length).to.be.equal(241);
-              tokenFilter.filter = 'lat';
-              runStep(tokenFilter, step2);
+              expect(polyFilter.filteredArray.length).to.be.equal(241);
+              polyFilter.filter = 'lat';
+              runStep(polyFilter, step2);
             }, 150);
           }, 50);
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(1);
-          expect(tokenFilter.filteredArray[0].code).to.be.equal('LV');
-          expect(tokenFilter.filteredArray[0].name).to.be.equal('Latvia');
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('LV');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Latvia');
           done();
         };
 
-        runStep(tokenFilter, step1);
+        runStep(polyFilter, step1);
       });
     });
 
     suite('stop-words', function () {
-      var tokenFilter;
+      var polyFilter;
 
       setup(function () {
-        tokenFilter = fixture('BasicTokenFilter');
-        tokenFilter.arrayToFilter = countries;
-        tokenFilter.filter = '';
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = countries;
+        polyFilter.filter = '';
       });
 
       teardown(function () {
@@ -217,51 +217,51 @@
 
       test('setting stop-words', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(0);
-          tokenFilter.stopWords = stopWords;
-          runStep(tokenFilter, step2);
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          polyFilter.stopWords = stopWords;
+          runStep(polyFilter, step2);
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(241);
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
           done();
         };
 
-        tokenFilter.filter = 'I have a dream';
-        runStep(tokenFilter, step1);
+        polyFilter.filter = 'I have a dream';
+        runStep(polyFilter, step1);
       });
 
       test('removing stop-words', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(1);
-          expect(tokenFilter.filteredArray[0].code).to.be.equal('IS');
-          expect(tokenFilter.filteredArray[0].name).to.be.equal('Iceland');
-          tokenFilter.stopWords = [];
-          runStep(tokenFilter, step2);
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('IS');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Iceland');
+          polyFilter.stopWords = [];
+          runStep(polyFilter, step2);
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(0);
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
           done();
         };
 
-        tokenFilter.stopWords = stopWords;
-        tokenFilter.filter = 'I have a ice dream';
-        runStep(tokenFilter, step1);
+        polyFilter.stopWords = stopWords;
+        polyFilter.filter = 'I have a ice dream';
+        runStep(polyFilter, step1);
       });
 
     });
 
     suite('filter max depth', function () {
-      var tokenFilter;
+      var polyFilter;
 
       setup(function () {
-        tokenFilter = fixture('BasicTokenFilter');
-        tokenFilter.arrayToFilter = complexArray;
-        tokenFilter.filterMaxDepth = 1;
-        tokenFilter.filter = '';
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = complexArray;
+        polyFilter.filterMaxDepth = 1;
+        polyFilter.filter = '';
       });
 
       teardown(function () {
@@ -269,33 +269,33 @@
 
       test('ignore properties deeper than max', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(0);
-          tokenFilter.filterMaxDepth = 2;
-          runStep(tokenFilter, step2);
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          polyFilter.filterMaxDepth = 2;
+          runStep(polyFilter, step2);
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(1);
-          expect(tokenFilter.filteredArray[0].lastname).to.be.equal('Holmes');
-          expect(tokenFilter.filteredArray[0].job.title).to.be.equal('detective');
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Holmes');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('detective');
           done();
         };
 
-        tokenFilter.filter = '221B Baker Stre';
-        runStep(tokenFilter, step1);
+        polyFilter.filter = '221B Baker Stre';
+        runStep(polyFilter, step1);
       });
     });
 
     suite('item properties to filter', function () {
-      var tokenFilter;
+      var polyFilter;
 
       setup(function () {
-        tokenFilter = fixture('BasicTokenFilter');
-        tokenFilter.arrayToFilter = complexArray;
-        tokenFilter.filterMaxDepth = 2;
-        tokenFilter.itemPropertiesToFilter = [];
-        tokenFilter.filter = '';
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = complexArray;
+        polyFilter.filterMaxDepth = 2;
+        polyFilter.itemPropertiesToFilter = [];
+        polyFilter.filter = '';
       });
 
       teardown(function () {
@@ -303,33 +303,33 @@
 
       test('ignore properties left out', function (done) {
         var step1 = function(e) {
-          finishStep(tokenFilter, step1);
-          expect(tokenFilter.filteredArray.length).to.be.equal(2);
-          expect(tokenFilter.filteredArray[0].lastname).to.be.equal('Doe');
-          expect(tokenFilter.filteredArray[0].job.title).to.be.equal('unknown');
-          expect(tokenFilter.filteredArray[0].job.company.name).to.be.equal('mystery');
-          expect(tokenFilter.filteredArray[1].lastname).to.be.equal('Holmes');
-          expect(tokenFilter.filteredArray[1].job.title).to.be.equal('detective');
-          tokenFilter.itemPropertiesToFilter = ['lastname', 'job', 'company', 'name'];
-          runStep(tokenFilter, step2);
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(2);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Doe');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('unknown');
+          expect(polyFilter.filteredArray[0].job.company.name).to.be.equal('mystery');
+          expect(polyFilter.filteredArray[1].lastname).to.be.equal('Holmes');
+          expect(polyFilter.filteredArray[1].job.title).to.be.equal('detective');
+          polyFilter.itemPropertiesToFilter = ['lastname', 'job', 'company', 'name'];
+          runStep(polyFilter, step2);
         };
         var step2 = function(e) {
-          finishStep(tokenFilter, step2);
-          expect(tokenFilter.filteredArray.length).to.be.equal(0);
-          tokenFilter.itemPropertiesToFilter = ['lastname', 'job', 'title', 'company', 'name'];
-          runStep(tokenFilter, step3);
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          polyFilter.itemPropertiesToFilter = ['lastname', 'job', 'title', 'company', 'name'];
+          runStep(polyFilter, step3);
         };
         var step3 = function(e) {
-          finishStep(tokenFilter, step3);
-          expect(tokenFilter.filteredArray.length).to.be.equal(1);
-          expect(tokenFilter.filteredArray[0].lastname).to.be.equal('Doe');
-          expect(tokenFilter.filteredArray[0].job.title).to.be.equal('unknown');
-          expect(tokenFilter.filteredArray[0].job.company.name).to.be.equal('mystery');
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Doe');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('unknown');
+          expect(polyFilter.filteredArray[0].job.company.name).to.be.equal('mystery');
           done();
         };
 
-        tokenFilter.filter = '221B OR unknow';
-        runStep(tokenFilter, step1);
+        polyFilter.filter = '221B OR unknow';
+        runStep(polyFilter, step1);
       });
     });
 

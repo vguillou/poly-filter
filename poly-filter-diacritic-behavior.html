@@ -1,0 +1,28 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="poly-filter-behavior.html">
+<script src="../js-replace-diacritics/replace-diacritics.js"></script>
+
+<script>
+(function() {
+  'use strict';
+
+  /**
+   * `Polymer.PolyFilterDiacriticBehavior` adds diacritics removal to `Polymer.PolyFilterBehavior`
+   *
+   * @polymerBehavior Polymer.PolyFilterDiacriticBehavior
+   */
+  Polymer.PolyFilterDiacriticBehaviorImpl = {
+
+    _processToken: function(token) {
+      return replaceDiacritics(token).trim();
+    }
+
+  };
+
+  /** @polymerBehavior Polymer.PolyFilterDiacriticBehavior */
+  Polymer.PolyFilterDiacriticBehavior = [
+    Polymer.PolyFilterBehavior,
+    Polymer.PolyFilterDiacriticBehaviorImpl
+  ];
+})();
+</script>

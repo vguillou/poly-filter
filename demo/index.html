@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>token-filter demo</title>
+  <title>poly-filter demo</title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -12,8 +12,7 @@
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
   <link rel="import" href="../../iron-list/iron-list.html">
-  <link rel="import" href="../token-filter-diacritic.html">
-  <link rel="import" href="../token-filter.html">
+  <link rel="import" href="../poly-filter-diacritic.html">
 
   <style is="custom-style">
     html,
@@ -40,7 +39,7 @@
 
   <template is="dom-bind" id="demo">
 
-    <token-filter-diacritic
+    <poly-filter-diacritic
       filter="[[filterString]]"
       array-to-filter="[[countries]]"
       filtered-array="{{filteredCountries}}"
@@ -48,16 +47,19 @@
       filter-max-depth="1"
       stop-words="[[stopWords]]"
       logical-or="or">
-   </token-filter-diacritic>
+   </poly-filter-diacritic>
 
     <div class="vertical layout">
 
       <span>Filter by country name only: <input type="string" value="{{filterString::input}}"></span>
+
       <iron-list items="[[filteredCountries]]" as="country">
         <template>
           <span>[[country.code]] - [[country.name]]</span>
         </template>
       </iron-list>
+
+      <span>You can try to use the logical operator 'OR' and type ignored word such as 'a', 'about', 'above', 'after', 'again' etc...</span>
 
     </div>
 
