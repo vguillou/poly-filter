@@ -1,6 +1,6 @@
 # token-filter
 
-_An Element and a Behavior to implement powerfull and intuitive client side filtering of collections. WIP!_
+_A fast, powerfull, and intuitive solution for client side filtering of arrays._
 
 ## Use it in your project :
 
