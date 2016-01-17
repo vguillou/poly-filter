@@ -43,6 +43,7 @@
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.1.4",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.2.2",
-    "iron-list": "PolymerElements/iron-list#^1.1.7"
+    "iron-list": "PolymerElements/iron-list#^1.1.7",
+    "web-component-tester": "*"
   }
 }
