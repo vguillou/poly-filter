@@ -9,16 +9,25 @@
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script src="../../web-component-tester/browser.js"></script>
 
-  <link rel="import" href="../poly-filter.html">
+  <link rel="import" href="../poly-filter-en.html">
 
 </head>
 <body>
 
   <test-fixture id="BasicPolyFilter">
     <template>
-      <poly-filter
+      <poly-filter-en
         filter-max-depth="1">
-      </poly-filter>
+      </poly-filter-en>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="LastnamePropertyPolyFilter">
+    <template>
+      <poly-filter-en
+        filter-max-depth="1"
+        item-properties-to-filter="lastname">
+      </poly-filter-en>
     </template>
   </test-fixture>
 
@@ -26,19 +35,19 @@
 
   suite('<poly-filter>', function() {
 
-    suite('basic filtering', function () {
+    suite('basic filtering', function() {
       var polyFilter;
 
-      setup(function () {
+      setup(function() {
         polyFilter = fixture('BasicPolyFilter');
         polyFilter.arrayToFilter = countries;
         polyFilter.filter = '';
       });
 
-      teardown(function () {
+      teardown(function() {
       });
 
-      test('all items if no filter', function (done) {
+      test('all items if no filter', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(241);
@@ -56,11 +65,11 @@
           expect(polyFilter.filteredArray.length).to.be.equal(241);
           done();
         };
-
+        
         runStep(polyFilter, step1);
       });
 
-      test('basic filtering', function (done) {
+      test('basic filtering', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(241);
@@ -76,7 +85,7 @@
         runStep(polyFilter, step1);
       });
 
-      test('update filter', function (done) {
+      test('update filter', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(241);
@@ -100,7 +109,7 @@
         runStep(polyFilter, step1);
       });
 
-      test('filter length', function (done) {
+      test('filter length', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(241);
@@ -122,19 +131,19 @@
       });
     });
 
-    suite('logical or', function () {
+    suite('logical or', function() {
       var polyFilter;
 
-      setup(function () {
+      setup(function() {
         polyFilter = fixture('BasicPolyFilter');
         polyFilter.arrayToFilter = countries;
         polyFilter.filter = '';
       });
 
-      teardown(function () {
+      teardown(function() {
       });
 
-      test('basic logical or', function (done) {
+      test('basic logical or', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(2);
@@ -150,7 +159,7 @@
         runStep(polyFilter, step1);
       });
 
-      test('logical or ignored without second member', function (done) {
+      test('logical or ignored without second member', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(1);
@@ -165,18 +174,18 @@
       });
     });
 
-    suite('debounce delay', function () {
+    suite('debounce delay', function() {
       var polyFilter;
 
-      setup(function () {
+      setup(function() {
         polyFilter = fixture('BasicPolyFilter');
         polyFilter.arrayToFilter = countries;
       });
 
-      teardown(function () {
+      teardown(function() {
       });
 
-      test('basic debounce delay', function (done) {
+      test('basic debounce delay', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(241);
@@ -203,19 +212,19 @@
       });
     });
 
-    suite('stop-words', function () {
+    suite('stop-words', function() {
       var polyFilter;
 
-      setup(function () {
+      setup(function() {
         polyFilter = fixture('BasicPolyFilter');
         polyFilter.arrayToFilter = countries;
         polyFilter.filter = '';
       });
 
-      teardown(function () {
+      teardown(function() {
       });
 
-      test('setting stop-words', function (done) {
+      test('setting stop-words', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(0);
@@ -232,7 +241,7 @@
         runStep(polyFilter, step1);
       });
 
-      test('removing stop-words', function (done) {
+      test('removing stop-words', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(1);
@@ -254,20 +263,20 @@
 
     });
 
-    suite('filter max depth', function () {
+    suite('filter max depth', function() {
       var polyFilter;
 
-      setup(function () {
+      setup(function() {
         polyFilter = fixture('BasicPolyFilter');
         polyFilter.arrayToFilter = complexArray;
         polyFilter.filterMaxDepth = 1;
         polyFilter.filter = '';
       });
 
-      teardown(function () {
+      teardown(function() {
       });
 
-      test('ignore properties deeper than max', function (done) {
+      test('ignore properties deeper than max', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(0);
@@ -287,10 +296,10 @@
       });
     });
 
-    suite('item properties to filter', function () {
+    suite('item properties to filter', function() {
       var polyFilter;
 
-      setup(function () {
+      setup(function() {
         polyFilter = fixture('BasicPolyFilter');
         polyFilter.arrayToFilter = complexArray;
         polyFilter.filterMaxDepth = 2;
@@ -298,10 +307,10 @@
         polyFilter.filter = '';
       });
 
-      teardown(function () {
+      teardown(function() {
       });
 
-      test('ignore properties left out', function (done) {
+      test('ignore properties left out', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(2);
@@ -330,6 +339,23 @@
 
         polyFilter.filter = '221B OR unknow';
         runStep(polyFilter, step1);
+      });
+
+      test('one property only', function(done) {
+        var onePropertyFilter = fixture('LastnamePropertyPolyFilter');
+        onePropertyFilter.arrayToFilter = complexArray;
+        onePropertyFilter.filter = '';
+        
+        var step1 = function(e) {
+          finishStep(onePropertyFilter, step1);
+          expect(onePropertyFilter.filteredArray.length).to.be.equal(1);
+          expect(onePropertyFilter.filteredArray[0].lastname).to.be.equal('Holmes');
+          expect(onePropertyFilter.filteredArray[0].job.title).to.be.equal('detective');
+          done();
+        };
+
+        onePropertyFilter.filter = 'foobar OR Holm';
+        runStep(onePropertyFilter, step1);
       });
     });
 

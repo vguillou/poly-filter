@@ -67,21 +67,22 @@
       },
 
       /**
-       * List of the item's properties to take into account for the filtering.
-       * If empty, item's in `arrayToFilter` will be filtered based on ``all`` their properties.
+       * List (`Array`) of the item's properties to take into account for the filtering.
+       * If empty, item's in `arrayToFilter` will be filtered based on **all** their properties.
+       * Can also be set to a single item property name (`String`).
        *
        * Example:
        * If the items in `arrayToFilter` represents countries with these properties :
        *     
        *     {'code': 'FR', 'name': 'France', 'language': 'French'}
        *     
-       * and you only want to filter your array based on the `name' and `code`, you must set
+       * and you only want to filter your array based on the `name` and `code`, you must set
        * `itemPropertiesToFilter` to :
        *     
        *     ['code', 'name']
        */
       itemPropertiesToFilter: {
-        type: Array,
+        type: Object,
         value: function() {
           return [];
         }
@@ -126,7 +127,7 @@
 
       /**
        * Array of words that should be ignored during the filtering process.
-       * All the stop-words MUST be in lower case.
+       * All the stop-words **must** be in lower case.
        */
       stopWords: {
         type: Array,
@@ -228,7 +229,7 @@
       if (!(filterMaxDepth > -1)) {
         throw 'filterMaxDepth (' + filterMaxDepth + ') must be a valid number >= 0';
       }
-      itemPropertiesToFilter = itemPropertiesToFilter || [];
+      itemPropertiesToFilter = this._concat([], itemPropertiesToFilter);
       stopWords = stopWords || [];
       if (arrayToFilter) {
         var result = [], item, i = 0, length = arrayToFilter.length;
