@@ -1,41 +1,4 @@
-<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="poly-filter-behavior.html">
-
-<!--
-A fast and customizable solution for client side filtering of arrays, made with and for Polymer.
-
-Example:
-
-    <poly-filter
-      filter="[[myFilterOrQueryToSearchFor]]"
-      array-to-filter="[[myArrayToFilter]]"
-      filtered-array="{{myArrayAfterItWasFiltered}}"
-      stop-words="[[arrayOfWordsToIgnore]]"
-      logical-or="or">
-    </poly-filter>
-
-### Notes
-
-If you are developing your own Polymer web-component with a filtering/searching functionality,
-consider using the `poly-filter-behavior` directly for maximum performances.
-
-If you want your filter/search to ignore accents and other character modifiers,
-use `poly-filter-diacritic` or `poly-filter-diacritic-behavior` instead.
-
-@group poly-filters
-@element poly-filter
-@demo demo/index.html
--->
-<script>
-(function() {
-  'use strict';
-  Polymer({
-
-    is: 'poly-filter',
-  
-    behaviors: [
-      Polymer.PolyFilterBehavior
-    ]
-  });
-})();
-</script>
+<link rel="import" href="poly-filter-en.html">
+<link rel="import" href="poly-filter-diacritic-behavior.html">
+<link rel="import" href="poly-filter-diacritic.html">

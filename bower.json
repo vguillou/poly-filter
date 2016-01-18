@@ -1,12 +1,12 @@
 {
-  "name": "poly-filters",
+  "name": "poly-filter",
   "version": "0.1.0",
   "authors": [
     "Vincent Guillou <vin.guillou@gmail.com>"
   ],
   "description": "A fast and customizable solution for client side filtering of arrays, made with and for Polymer.",
   "main": [
-    "poly-filter.html",
+    "poly-filter-en.html",
     "poly-filter-diacritic.html",
     "poly-filter-behavior.html",
     "poly-filter-diacritic-behavior.html"
@@ -18,8 +18,6 @@
     "autocomplete",
     "web-components",
     "web-component",
-    "web components",
-    "web component",
     "polymer"
   ],
   "license": "MIT",
@@ -33,9 +31,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/vguillou/poly-filters.git"
+    "url": "git://github.com/vguillou/poly-filter.git"
   },
-  "homepage": "https://vguillou.github.io/webcomponents/poly-filters",
+  "homepage": "https://vguillou.github.io/webcomponents/poly-filter",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.3",
     "js-replace-diacritics": "yvg/js-replace-diacritics#master"
