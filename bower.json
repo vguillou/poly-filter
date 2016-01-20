@@ -1,6 +1,6 @@
 {
   "name": "poly-filter",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "authors": [
     "Vincent Guillou <vin.guillou@gmail.com>"
   ],
@@ -26,8 +26,7 @@
     "res",
     "node_modules",
     "bower_components",
-    "test",
-    "tests"
+    "test"
   ],
   "repository": {
     "type": "git",

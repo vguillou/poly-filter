@@ -80,6 +80,7 @@
        * `itemPropertiesToFilter` to :
        *     
        *     ['code', 'name']
+       * @type {Array|String}
        */
       itemPropertiesToFilter: {
         type: Object,
@@ -175,7 +176,6 @@
       this.stopWords = this.stopWords || [];
 
       this.debounce('_generateFilteredArray' + this.localName, function() {
-        //console.time('_generateFilteredArray ' + filter);
         if (filter && filter.length >= (filterMinLength || 2)) {
           var result = [], itemTokens, j = 0, length = this.arrayToFilter.length;
           // Breaking the filter/query on the logical OR to produce all tokens
