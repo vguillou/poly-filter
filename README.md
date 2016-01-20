@@ -1,5 +1,7 @@
 # poly-filter
 
+[![Build Status](https://travis-ci.org/vguillou/poly-filter.svg?branch=master)](https://travis-ci.org/vguillou/poly-filter)
+
 _A fast and customizable solution for client side filtering of arrays, made for and with Polymer._
 
 ## Use it in your project :
