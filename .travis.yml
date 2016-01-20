@@ -1,4 +1,12 @@
 language: node_js
+sudo: false
+addons:
+  firefox: latest
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
 node_js:
   - "0.12.2"
 before_install:
