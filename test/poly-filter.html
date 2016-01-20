@@ -26,7 +26,7 @@
     <template>
       <poly-filter-en
         filter-max-depth="1"
-        item-properties-to-filter="lastname">
+        filter-by="lastname">
       </poly-filter-en>
     </template>
   </test-fixture>
@@ -296,14 +296,14 @@
       });
     });
 
-    suite('item properties to filter', function() {
+    suite('filter by', function() {
       var polyFilter;
 
       setup(function() {
         polyFilter = fixture('BasicPolyFilter');
         polyFilter.arrayToFilter = complexArray;
         polyFilter.filterMaxDepth = 2;
-        polyFilter.itemPropertiesToFilter = [];
+        polyFilter.filterBy = [];
         polyFilter.filter = '';
       });
 
@@ -319,13 +319,13 @@
           expect(polyFilter.filteredArray[0].job.company.name).to.be.equal('mystery');
           expect(polyFilter.filteredArray[1].lastname).to.be.equal('Holmes');
           expect(polyFilter.filteredArray[1].job.title).to.be.equal('detective');
-          polyFilter.itemPropertiesToFilter = ['lastname', 'job', 'company', 'name'];
+          polyFilter.filterBy = ['lastname', 'job', 'company', 'name'];
           runStep(polyFilter, step2);
         };
         var step2 = function(e) {
           finishStep(polyFilter, step2);
           expect(polyFilter.filteredArray.length).to.be.equal(0);
-          polyFilter.itemPropertiesToFilter = ['lastname', 'job', 'title', 'company', 'name'];
+          polyFilter.filterBy = ['lastname', 'job', 'title', 'company', 'name'];
           runStep(polyFilter, step3);
         };
         var step3 = function(e) {

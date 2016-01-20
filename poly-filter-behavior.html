@@ -67,9 +67,8 @@
       },
 
       /**
-       * List (`Array`) of the item's properties to take into account for the filtering.
-       * If empty, item's in `arrayToFilter` will be filtered based on **all** their properties.
-       * Can also be set to a single item property name (`String`).
+       * Single property (`String`) or list (`Array`) of the item's properties
+       * to take into account for the filtering.
        *
        * Example:
        * If the items in `arrayToFilter` represents countries with these properties :
@@ -77,12 +76,18 @@
        *     {'code': 'FR', 'name': 'France', 'language': 'French'}
        *     
        * and you only want to filter your array based on the `name` and `code`, you must set
-       * `itemPropertiesToFilter` to :
+       * `filterBy` to :
        *     
        *     ['code', 'name']
+       *
+       * ***Special cases :***
+       * - If an empty `Array`, item's in `arrayToFilter` will be filtered based
+       * on **all** their properties.
+       * - If `arrayToFilter` is a flat array (eg of `String`), then changing this property
+       * will have no effect.
        * @type {Array|String}
        */
-      itemPropertiesToFilter: {
+      filterBy: {
         type: Object,
         value: function() {
           return [];
@@ -162,7 +167,7 @@
     },
 
     observers: [
-      '_processArray(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords)',
+      '_processArray(arrayToFilter, filterBy, filterTokenizerRegExp, filterMaxDepth, stopWords)',
       '_generateFilteredArray(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr)'
     ],
 
@@ -222,14 +227,14 @@
      * From a given `arrayToFilter`, produce a 'twin' array of by breaking specified
      * item's properties into a flattened array of normalized tokens without stop-words.
      */
-    _processArray: function(arrayToFilter, itemPropertiesToFilter, filterTokenizerRegExp, filterMaxDepth, stopWords) {
+    _processArray: function(arrayToFilter, filterBy, filterTokenizerRegExp, filterMaxDepth, stopWords) {
       if (!filterTokenizerRegExp) {
         throw 'filterTokenizerRegExp must not be undefined';
       }
       if (!(filterMaxDepth > -1)) {
         throw 'filterMaxDepth (' + filterMaxDepth + ') must be a valid number >= 0';
       }
-      itemPropertiesToFilter = this._concat([], itemPropertiesToFilter);
+      filterBy = this._concat([], filterBy);
       stopWords = stopWords || [];
       if (arrayToFilter) {
         var result = [], item, i = 0, length = arrayToFilter.length;
@@ -237,7 +242,7 @@
           for (; i < length; i++) {
             item = arrayToFilter[i];
             if (item) {
-              result.push(this._processItem(item, itemPropertiesToFilter, filterTokenizerRegExp, 0, filterMaxDepth, stopWords));
+              result.push(this._processItem(item, filterBy, filterTokenizerRegExp, 0, filterMaxDepth, stopWords));
             }
             if (i + 1 === length) {
               // All items processed, set the result
@@ -256,7 +261,7 @@
      * Break specified item's properties into a flattened array of
      * normalized tokens without stop-words.
      */
-    _processItem: function(item, itemPropertiesToFilter, filterTokenizerRegExp, depth, filterMaxDepth, stopWords) {
+    _processItem: function(item, filterBy, filterTokenizerRegExp, depth, filterMaxDepth, stopWords) {
       if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
         return this._processValue(item, filterTokenizerRegExp, stopWords);
       } else {
@@ -264,16 +269,16 @@
         if (item) {
           if (item.constructor === Array) {
             for (var i = 0, l = item.length; i < l; i++) {
-              flattenedItemTokens = this._concat(flattenedItemTokens, this._processItem(item[i], itemPropertiesToFilter, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
+              flattenedItemTokens = this._concat(flattenedItemTokens, this._processItem(item[i], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
             }
           }
           else if (depth <= filterMaxDepth) {
-            var filterAllProps = !itemPropertiesToFilter || !itemPropertiesToFilter.length;
+            var filterAllProps = !filterBy || !filterBy.length;
             for (var propName in item) {
-              if (!filterAllProps && itemPropertiesToFilter.indexOf(propName) < 0) {
+              if (!filterAllProps && filterBy.indexOf(propName) < 0) {
                 continue;
               } else {
-                flattenedItemTokens = this._concat(flattenedItemTokens, this._processItem(item[propName], itemPropertiesToFilter, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
+                flattenedItemTokens = this._concat(flattenedItemTokens, this._processItem(item[propName], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
               }
             }
           }
