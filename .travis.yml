@@ -9,10 +9,6 @@ addons:
     packages:
       - google-chrome-stable
       - g++-4.8
-    sauce_connect:
-      username: "vguillou"
-      access_key:
-        secure: "rnbT/C4fPvhhZhdJuqMue/9sPh4Nc0wnSHINLUyf8SUFefHY185pPhN4xYmEafWM9KADnVw4do2LtbFQEXOvxgR42npc5DKk28ayhfavMWzcz0uVBlE/8qC3PjwrRL1Tue3KmewChesTP50PzA+V6YWz7jl80lk2TLoIZGqRkP4S3WoQVF7GRKeo2hS6/+Yf3dvTvc4+EjztHXS07SzUBFX4EGHFxsKQdR/s7AJcihJTsd+HQuSJoTXLWK5D9cH4RsRCuSV1yG2BMfWr7lfawQW41YVW+1HPI3odfa5h377dOAJlNjYeDhz+xVGtqb85o92r+1IjmpxpzWIlPYYu8jQ+a+O0WUzvV3LEOcH2N1yEUUFBgNIr3nncIlWvZ6E3Dcvs1VeOv0DN3maf3wy3pAovtmyTxd61Cv1UIbW5Jne4CMiNqPy0GmCObbCTsf7VuRO2lVmb3iMgNNbuqExhJPFKj6xYeD3Pl6MLMrPDRwMMyz9FdIfJvdYR0wKxCBEde7jeUPdqmInDsMfRTqur0hqzFdetBNJps+ejAWsxMQFWQsqo2k3dHcFJTkw5HRI/y8qMkCUDDKtg608Tlxe07MVav4Ka1cIv3xvnc4tI0r3hN4b7nyFzRo5zc6x5vzJLqvw0YjhpO3pVRmObZCLZUJuJ8LGemYfAcZ2MrssvXqc="
 node_js: stable
 env:
   global:
@@ -24,4 +20,3 @@ before_script:
   - polylint
 script:
   - xvfb-run wct
-  - "if [ \"${TRAVIS_PULL_REQUEST}\" = \"false\" ]; then wct -s 'default'; fi"
