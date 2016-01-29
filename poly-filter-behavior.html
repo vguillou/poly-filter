@@ -127,7 +127,7 @@
       filterTokenizerRegExp: {
         type: RegExp,
         value: function() {
-          return /[.?!,\\/ |-]/ig;
+          return /[\s\b.?!",\\/|-]/gi;
         }
       },
 
@@ -148,10 +148,31 @@
        * Example:
        * If the logical OR operator is set to 'or' and the `filter` is 'united ki or wede',
        * then a filtered country list will retain both 'United Kingdom' and 'Sweden'.
+       * 
+       * **Important:**
+       * This element uses regular expressions to match operator. Therefore, if you want
+       * to use any character that is a special one in `RegEx` (for exemple the pipe),
+       * then you need to escape it twice.
+       * Example:
+       * If you want to use `||` as the logical OR operator, then you need to set this
+       * property to `\\\\|\\\\|'.
        */
       logicalOr: {
         type: String,
         value: 'or'
+      },
+
+      /**
+       * RegExp that allows to "grab" strings between delimiters
+       * in order to check for a perfect match. Default delimiters are double quotes `"`.
+       * @type {RegExp}
+       */
+      _exactStringDelimiterRegExp: {
+        type: String,
+        value: function() {
+          return /(")(?:(?=(\\?))\2.)*?\1/gi;
+        },
+        readOnly: true
       },
 
       /**
@@ -168,28 +189,44 @@
 
     observers: [
       '_processArray(arrayToFilter, filterBy, filterTokenizerRegExp, filterMaxDepth, stopWords)',
-      '_generateFilteredArray(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr)'
+      '_generateFilteredArray(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr, _exactStringDelimiterRegExp)'
     ],
+
+    get _logicalOrRegEx() {
+      return new RegExp('(^|\\s|\\b)' + this.logicalOr + '($|\\s|\\b)(?=(?:[^\\"]*\\"[^\\"]*\\")*[^\\"]*$)', 'gi');
+    },
 
     /**
      * Actual filtering function.
      */
-    _generateFilteredArray: function(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr) {
+    _generateFilteredArray: function(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr, _exactStringDelimiterRegExp) {
       if (!this.filterTokenizerRegExp) {
         throw 'filterTokenizerRegExp must not be undefined';
       }
       this.stopWords = this.stopWords || [];
 
       this.debounce('_generateFilteredArray' + this.localName, function() {
-        if (filter && filter.length >= (filterMinLength || 2)) {
-          var result = [], itemTokens, j = 0, length = this.arrayToFilter.length;
+        var filterLc = ('' + filter).toLowerCase().trim();
+        if (filterLc.length >= (filterMinLength || 2)) {
+          var result = [], itemTokensAndValues, j = 0, length = this.arrayToFilter.length;
           // Breaking the filter/query on the logical OR to produce all tokens
-          var filterParts = logicalOr ? filter.toLowerCase().split(logicalOr.toLowerCase()) : [filter];
-          var filterPart, filterPartsTokens = [];
+          var filterParts = logicalOr ? filterLc.split(this._logicalOrRegEx) : [filterLc];
+          var filterPart, exactStrings = [], filterPartsTokens = [];
           for (var i = 0, l = filterParts.length; i < l; i++) {
             filterPart = filterParts[i].trim();
-            if (filterPart) {
-              filterPartsTokens.push(this._processValue(filterPart, this.filterTokenizerRegExp, this.stopWords));
+            // Extract strings between quotes (to match perfectly)
+            exactStrings = (filterPart.match(this._exactStringDelimiterRegExp) || []).map(function(str) {
+              return ('' + str).substring(1, str.length - 1).toLowerCase();
+            });
+            // remove strings between quotes
+            filterPart = filterPart.replace(this._exactStringDelimiterRegExp, '');
+            
+            if (filterPart || exactStrings.length > 0) {
+              filterPartsTokens.push({
+                values: exactStrings,
+                // tokenize the rest
+                tokens: this._processValue(filterPart, this.filterTokenizerRegExp, this.stopWords)
+              });
             }
           }
 
@@ -197,11 +234,15 @@
             for (; j < length; j++) {
               // Actual filtering process: Instead of directly filtering the `arrayToFilter`, we traverse
               // the preprocessed `_processedArray` to speed things up considerably.
-              itemTokens = _processedArray[j];
+              itemTokensAndValues = _processedArray[j];
               if (filterPartsTokens.some(function(filterTokens) {
-                return filterTokens.every(function(token) {
-                  return token && itemTokens.some(function(value) {
-                    return value.indexOf(token) > -1;
+                return filterTokens.tokens.every(function(token) {
+                  return token && itemTokensAndValues.tokens.some(function(t) {
+                    return t.indexOf(token) > -1;
+                  });
+                }) && filterTokens.values.every(function(exactString) {
+                  return exactString && itemTokensAndValues.values.some(function(v) {
+                    return v.indexOf(exactString) > -1;
                   });
                 });
               })) {
@@ -263,13 +304,16 @@
      */
     _processItem: function(item, filterBy, filterTokenizerRegExp, depth, filterMaxDepth, stopWords) {
       if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
-        return this._processValue(item, filterTokenizerRegExp, stopWords);
+        return {
+          values: typeof item !== 'undefined' && item !== null ? [('' + item).toLowerCase()] : undefined,
+          tokens: this._processValue(item, filterTokenizerRegExp, stopWords)
+        };
       } else {
-        var flattenedItemTokens = [];
+        var flattenedItemTokensAndValues = {values: [], tokens: []};
         if (item) {
           if (item.constructor === Array) {
             for (var i = 0, l = item.length; i < l; i++) {
-              flattenedItemTokens = this._concat(flattenedItemTokens, this._processItem(item[i], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
+              flattenedItemTokensAndValues = this._concatValuesAndTokens(flattenedItemTokensAndValues, this._processItem(item[i], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
             }
           }
           else if (depth <= filterMaxDepth) {
@@ -278,12 +322,12 @@
               if (!filterAllProps && filterBy.indexOf(propName) < 0) {
                 continue;
               } else {
-                flattenedItemTokens = this._concat(flattenedItemTokens, this._processItem(item[propName], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
+                flattenedItemTokensAndValues = this._concatValuesAndTokens(flattenedItemTokensAndValues, this._processItem(item[propName], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
               }
             }
           }
         }
-        return flattenedItemTokens;
+        return flattenedItemTokensAndValues;
       }
     },
 
@@ -322,6 +366,14 @@
     _concat: function(dest, values) {
       if (values) {
         return dest.concat(values);
+      }
+      return dest;
+    },
+
+    _concatValuesAndTokens: function(dest, newSrc) {
+      if (newSrc) {
+        dest.tokens = this._concat(dest.tokens, newSrc.tokens);
+        dest.values = this._concat(dest.values, newSrc.values);
       }
       return dest;
     }

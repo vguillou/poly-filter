@@ -59,7 +59,15 @@
         </template>
       </iron-list>
 
-      <span>You can try to use the logical operator 'OR' and type ignored word such as 'a', 'about', 'above', 'after', 'again' etc...</span>
+      <span>The elements and behaviors feature support for:
+        <ul>
+          <li>Precise control (by name and depth) over which properties to use for filtering.</li>
+          <li>Logical OR operator. Try to search <i>france or sweden</i>.</li>
+          <li>Exact string matching when delimited by quotes. Try to search <i>democratic republic</i> and <i>"democratic republic"</i>.</li>
+          <li>Stop-words (ie ignored words) list. Try to add words such as <i>'a', 'about', 'above', 'after' or 'again'</i> to a query.</li>
+          <li>Diacritics: Accent and other character modifiers are ignored when filtering.</li>
+        </ul>
+      </span>
 
     </div>
 
