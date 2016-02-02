@@ -232,6 +232,11 @@
         var filterMethodImpl = this._filterMethod;
         if (filterLc.length >= (filterMinLength || 2)) {
           var result = [], itemTokensAndValues, j = 0, length = this.arrayToFilter.length;
+          // Fix : If odd number of quotes, we need to ignore the last one to match our logical or pattern
+          var quotesCount = (filterLc.match(/\"/g) || []).length;
+          if (quotesCount & 1) {
+            filterLc = filterLc.replace(/\"([^\"]*)$/,'$1');
+          }
           // Breaking the filter/query on the logical OR to produce all tokens
           var filterParts = logicalOr ? filterLc.split(this._logicalOrRegEx) : [filterLc];
           var filterPart, exactStrings = [], filterPartsTokens = [];
