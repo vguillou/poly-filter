@@ -1,6 +1,7 @@
 # poly-filter
 
 [![Build Status](https://travis-ci.org/vguillou/poly-filter.svg?branch=master)](https://travis-ci.org/vguillou/poly-filter)
+[![GitHub version](https://badge.fury.io/gh/vguillou%2Fpoly-filter.svg)](https://badge.fury.io/gh/vguillou%2Fpoly-filter)
 
 _A fast and customizable solution for client side filtering of arrays, made for and with Polymer._
 
