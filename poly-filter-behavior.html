@@ -163,6 +163,18 @@
       },
 
       /**
+       * The method to use to determine if an item matches the filter.
+       * The possible values are:
+       * - `'contains'` (default) For each token `t` in the `filter` query, one or more token of a given item need to contain with token `t`.
+       * - `'startsWith'`: For each token `t` in the `filter` query, one or more token of a given item need to start with said token `t`.
+       * - `'equals'` For each token `t` in the `filter` query, one or more token of a given item need to be equal to said token `t`.
+       */
+      filterMethod: {
+        type: String,
+        value: 'contains'
+      },
+
+      /**
        * RegExp that allows to "grab" strings between delimiters
        * in order to check for a perfect match. Default delimiters are double quotes `"`.
        * @type {RegExp}
@@ -170,7 +182,7 @@
       _exactStringDelimiterRegExp: {
         type: String,
         value: function() {
-          return /(")(?:(?=(\\?))\2.)*?\1/gi;
+          return /(")(?:(?=(\\?))\2.)*?\1/g;
         },
         readOnly: true
       },
@@ -196,10 +208,20 @@
       return new RegExp('(^|\\s|\\b)' + this.logicalOr + '($|\\s|\\b)(?=(?:[^\\"]*\\"[^\\"]*\\")*[^\\"]*$)', 'gi');
     },
 
+    get _filterMethod() {
+      var method = function(token) {return function(str) {return str.indexOf(token) > -1;};};
+      if (this.filterMethod === 'startsWith') {
+        method = function(token) {return function(str) {return str.startsWith(token);};};
+      } else if (this.filterMethod === 'equals') {
+        method = function(token) {return function(str) {return str === token;};};
+      }
+      return method;
+    },
+
     /**
      * Actual filtering function.
      */
-    _generateFilteredArray: function(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr, _exactStringDelimiterRegExp) {
+    _generateFilteredArray: function(filter, _processedArray, filterMinLength, filterDebounceDelay, logicalOr, filterMethod, _exactStringDelimiterRegExp) {
       if (!this.filterTokenizerRegExp) {
         throw 'filterTokenizerRegExp must not be undefined';
       }
@@ -207,6 +229,7 @@
 
       this.debounce('_generateFilteredArray' + this.localName, function() {
         var filterLc = ('' + filter).toLowerCase().trim();
+        var filterMethodImpl = this._filterMethod;
         if (filterLc.length >= (filterMinLength || 2)) {
           var result = [], itemTokensAndValues, j = 0, length = this.arrayToFilter.length;
           // Breaking the filter/query on the logical OR to produce all tokens
@@ -237,9 +260,7 @@
               itemTokensAndValues = _processedArray[j];
               if (filterPartsTokens.some(function(filterTokens) {
                 return filterTokens.tokens.every(function(token) {
-                  return token && itemTokensAndValues.tokens.some(function(t) {
-                    return t.indexOf(token) > -1;
-                  });
+                  return token && itemTokensAndValues.tokens.some(filterMethodImpl(token));
                 }) && filterTokens.values.every(function(exactString) {
                   return exactString && itemTokensAndValues.values.some(function(v) {
                     return v.indexOf(exactString) > -1;
