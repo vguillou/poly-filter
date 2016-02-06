@@ -131,6 +131,64 @@
       });
     });
 
+    suite('exact string delimiter', function() {
+      var polyFilter;
+
+      setup(function() {
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = countries;
+      });
+
+      teardown(function() {
+      });
+
+      test('basic exact string delimiter', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('AE');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('United Arab Emirates');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('US');
+          expect(polyFilter.filteredArray[1].name).to.be.equal('United States');
+          expect(polyFilter.filteredArray[2].code).to.be.equal('UM');
+          expect(polyFilter.filteredArray[2].name).to.be.equal('United States Minor Outlying Islands');
+          runStep(polyFilter, step2);
+          polyFilter.filter = '"united s"';
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(2);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('US');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('United States');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('UM');
+          expect(polyFilter.filteredArray[1].name).to.be.equal('United States Minor Outlying Islands');
+          done();
+        };
+
+        polyFilter.filter = 'united s';
+        runStep(polyFilter, step1);
+      });
+
+      test('exact string delimiter ignored if not closed', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(8);
+          runStep(polyFilter, step2);
+          polyFilter.filter = '"liech" or "repub of"';
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('LI');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Liechtenstein');
+          done();
+        };
+        
+        polyFilter.filter = '"liech" or "repub of';
+        runStep(polyFilter, step1);
+      });
+    });
+
     suite('logical or', function() {
       var polyFilter;
 
@@ -170,6 +228,32 @@
 
         polyFilter.logicalOr = 'foobar';
         polyFilter.filter = 'canada foobar';
+        runStep(polyFilter, step1);
+      });
+
+      test('logical or ignored when between exact string delimiters', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('FI');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Finland');
+          runStep(polyFilter, step2);
+          polyFilter.filter = 'finland || "iceland || denmark';
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('DK');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Denmark');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('FI');
+          expect(polyFilter.filteredArray[1].name).to.be.equal('Finland');
+          expect(polyFilter.filteredArray[2].code).to.be.equal('IS');
+          expect(polyFilter.filteredArray[2].name).to.be.equal('Iceland');
+          done();
+        };
+
+        polyFilter.logicalOr = '\\|\\|';
+        polyFilter.filter = 'finland || "iceland || denmark"';
         runStep(polyFilter, step1);
       });
     });
@@ -356,6 +440,82 @@
 
         onePropertyFilter.filter = 'foobar OR Holm';
         runStep(onePropertyFilter, step1);
+      });
+    });
+
+    suite('filter method', function() {
+      var polyFilter;
+
+      setup(function() {
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = countries;
+      });
+
+      teardown(function() {
+      });
+
+      test('basic contains', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(4);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('BY');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('BN');
+          expect(polyFilter.filteredArray[2].code).to.be.equal('CY');
+          expect(polyFilter.filteredArray[3].code).to.be.equal('RU');
+          done();
+        };
+
+        polyFilter.filterMethod = 'contains';
+        polyFilter.filter = 'rus';
+        runStep(polyFilter, step1);
+      });
+
+      test('basic startsWith', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('RU');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Russian Federation');
+          done();
+        };
+
+        polyFilter.filterMethod = 'startsWith';
+        polyFilter.filter = 'rus';
+        runStep(polyFilter, step1);
+      });
+
+      test('basic equals', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(4);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('BV');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('CX');
+          expect(polyFilter.filteredArray[2].code).to.be.equal('HM');
+          expect(polyFilter.filteredArray[3].code).to.be.equal('NF');
+          done();
+        };
+
+        polyFilter.filterMethod = 'equals';
+        polyFilter.filter = 'island';
+        runStep(polyFilter, step1);
+      });
+
+      test('contains then equals', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(17);
+          runStep(polyFilter, step2);
+          polyFilter.filterMethod = 'equals';
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(4);
+          done();
+        };
+        
+        polyFilter.filterMethod = 'contains';
+        polyFilter.filter = 'island';
+        runStep(polyFilter, step1);
       });
     });
 
