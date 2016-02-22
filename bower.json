@@ -6,7 +6,7 @@
   ],
   "description": "A fast and customizable solution for client side filtering of arrays, made with and for Polymer.",
   "main": [
-    "poly-filter-en.html",
+    "poly-filter.html",
     "poly-filter-diacritic.html",
     "poly-filter-behavior.html",
     "poly-filter-diacritic-behavior.html"
