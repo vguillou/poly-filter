@@ -11,32 +11,34 @@ iron-list wrapper for the demo
       iron-list {
         max-height: 350px;
         min-height: 35px;
-        margin: 8px 15px;
+        margin: 8px 15px 0 15px;
         border-style: solid;
       }
 
       .item {
-        height: 30px;
-        line-height: 30px;
+        min-height: 30px;
+        border-bottom: 1px solid #e0e0e0;
         @apply(--layout-horizontal);
+        @apply(--layout-center);
       }
 
       .item > * {
-        margin: 0 8px;
+        margin: 0 6px;
       }
 
       .item .name {
-        @apply(--layout-flex);
+        
       }
 
       .item .scientificName {
         font-style: italic;
         font-size: 0.7em;
+        @apply(--layout-flex);
       }
 
       .item .status {
         font-weight: bold;
-        min-width: 155px;
+        text-align: end;
       }
     </style>
     <iron-list id="list" items="[[items]]" as="animal">

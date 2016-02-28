@@ -27,7 +27,7 @@
     }
 
     .vertical-section {
-      margin-bottom: 50px;
+      margin: 0 8px 50px 8px;
     }
   </style>
 </head>
@@ -38,9 +38,8 @@
 
     <template is="dom-bind" id="demo">
 
-
-      <h3>Interactive demo</h3>
       <div class="vertical-section">
+        <h3>Interactive demo</h3>
 
         <poly-filter
           array-to-filter="[[wwf]]"
@@ -56,8 +55,10 @@
       </div>
 
 
-      <h3>Find turtles</h3>
+      
       <div class="vertical-section">
+        <h3>Find turtles</h3>
+        
         <marked-element>
           <div class="markdown-html"></div>
           <script type="text/markdown">
@@ -81,8 +82,10 @@
       </div>
 
 
-      <h3>Only critically endangered species (searching only the `status` property)</h3>
+      
       <div class="vertical-section">
+        <h3>Only critically endangered species (searching only the `status` property)</h3>
+
         <marked-element>
           <div class="markdown-html"></div>
           <script type="text/markdown">
@@ -108,8 +111,10 @@
       </div>
 
 
-      <h3>Find critically endangered Tigers (filter on multiple properties)</h3>
+      
       <div class="vertical-section">
+        <h3>Find critically endangered Tigers (filter on multiple properties)</h3>
+
         <marked-element>
           <div class="markdown-html"></div>
           <script type="text/markdown">
@@ -134,8 +139,10 @@
       </div>
 
 
-      <h3>Find all where a word starts with 'delphin' or 'dolphin'</h3>
+      
       <div class="vertical-section">
+        <h3>Find all where a word starts with 'delphin' or 'dolphin'</h3>
+
         <marked-element>
           <div class="markdown-html"></div>
           <script type="text/markdown">
@@ -160,8 +167,11 @@
         <demo-list items="[[filteredWwf4]]"></demo-list>
       </div>
 
-      <h3>Ignore specified words (stopWords = ['a', 'shaolin'])</h3>
+      
+
       <div class="vertical-section">
+        <h3>Ignore specified words (stopWords = ['a', 'shaolin'])</h3>
+
         <marked-element>
           <div class="markdown-html"></div>
           <script type="text/markdown">
@@ -187,8 +197,10 @@
       </div>
 
 
-      <h3>Find a list of coma separated animals</h3>
+      
       <div class="vertical-section">
+        <h3>Find a list of coma separated animals</h3>
+
         <marked-element>
           <div class="markdown-html"></div>
           <script type="text/markdown">
@@ -214,8 +226,10 @@
       </div>
 
 
-      <h3>Use quotes in a query to specify an exact match</h3>
+      
       <div class="vertical-section">
+        <h3>Use quotes in a query to specify an exact match</h3>
+
         <marked-element>
           <div class="markdown-html"></div>
           <script type="text/markdown">
@@ -239,8 +253,10 @@
       </div>
 
 
-      <h3>Ignore diacritics (It will find Gorillas)</h3>
+      
       <div class="vertical-section">
+        <h3>Ignore diacritics (It will find Gorillas)</h3>
+        
         <marked-element>
           <div class="markdown-html"></div>
           <script type="text/markdown">
