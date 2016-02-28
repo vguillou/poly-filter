@@ -4,7 +4,7 @@
   "authors": [
     "Vincent Guillou <vin.guillou@gmail.com>"
   ],
-  "description": "A fast and customizable solution for client side filtering of arrays, made with and for Polymer.",
+  "description": "A fast and customizable solution for client side filtering of arrays, built with and for Polymer.",
   "main": [
     "poly-filter.html",
     "poly-filter-diacritic.html",
