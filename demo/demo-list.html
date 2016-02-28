@@ -1,0 +1,73 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-list/iron-list.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+
+<!--
+iron-list wrapper for the demo
+-->
+<dom-module id="demo-list">
+  <template>
+    <style>
+      iron-list {
+        max-height: 350px;
+        min-height: 35px;
+        margin: 8px 15px;
+        border-style: solid;
+      }
+
+      .item {
+        height: 30px;
+        line-height: 30px;
+        @apply(--layout-horizontal);
+      }
+
+      .item > * {
+        margin: 0 8px;
+      }
+
+      .item .name {
+        @apply(--layout-flex);
+      }
+
+      .item .scientificName {
+        font-style: italic;
+        font-size: 0.7em;
+      }
+
+      .item .status {
+        font-weight: bold;
+        min-width: 155px;
+      }
+    </style>
+    <iron-list id="list" items="[[items]]" as="animal">
+      <template>
+        <div class="item">
+          <span class="name">[[animal.name]]</span>
+          <span class="scientificName">([[animal.scientificName]])</span>
+          <span class="status">[[animal.status]]</span>
+        </div>
+      </template>
+    </iron-list>
+  </template>
+
+  <script>
+  (function() {
+    'use strict';
+    Polymer({
+
+      is: 'demo-list',
+    
+      properties: {
+        items: {
+          type: Array,
+          observer: '_resize'
+        }
+      },
+
+      _resize: function() {
+        this.$.list.notifyResize();
+      }
+    });
+  })();
+  </script>
+</dom-module>

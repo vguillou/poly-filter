@@ -10,491 +10,372 @@
   <meta name="theme-color" content="#ff5722">
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
-  <link rel="import" href="../../iron-list/iron-list.html">
+  <link rel="import" href="../../marked-element/marked-element.html">
+  <link rel="import" href="../poly-filter.html">
   <link rel="import" href="../poly-filter-diacritic.html">
+  <link rel="import" href="demo-list.html">
 
   <style is="custom-style">
-    html,
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       margin: 0;
     }
-    div.vertical.layout {
+
+    .vertical-section-container {
+      max-width: 700px;
       margin: 0 auto;
-      max-width: 450px;
-      @apply(--layout-vertical);
     }
-    span {
-      margin: 10px;
-      @apply(--layout-self-center);
-    }
-    iron-list {
-      height: 500px;
-      border-style: solid;
-    }
-    li {
-      margin: 6px;
+
+    .vertical-section {
+      margin-bottom: 50px;
     }
   </style>
+</head>
   
 <body unresolved>
+  
+  <div class="vertical-section-container centered">
 
-  <template is="dom-bind" id="demo">
+    <template is="dom-bind" id="demo">
 
-    <poly-filter-diacritic
-      filter="[[filterString]]"
-      array-to-filter="[[countries]]"
-      filtered-array="{{filteredCountries}}"
-      filter-by="[[filterProperties]]"
-      filter-max-depth="1"
-      logical-or="or">
-   </poly-filter-diacritic>
 
-    <div class="vertical layout">
+      <h3>Interactive demo</h3>
+      <div class="vertical-section">
 
-      <span>Filter by country name only: <input type="string" value="{{filterString::input}}"></span>
+        <poly-filter
+          array-to-filter="[[wwf]]"
+          filter="[[filterString]]"
+          filtered-array="{{filteredWwfInteractive}}">
+        </poly-filter>
 
-      <iron-list items="[[filteredCountries]]" as="country">
-        <template>
-          <span>[[country.code]] - [[country.name]]</span>
-        </template>
-      </iron-list>
+        <span>Filter endangered animals:
+            <input type="string" value="{{filterString::input}}" autofocus>
+        </span>
 
-      <span>The elements and behaviors feature support for:
-        <ul>
-          <li>Precise control (by name and depth) over which properties to use for filtering.</li>
-          <li>Logical OR operator. Try to search <i>france or sweden</i>.</li>
-          <li>Exact string matching when delimited by quotes. Try to search <i>democratic republic</i> and <i>"democratic republic"</i>.</li>
-          <li>Stop-words (ie ignored words) list. Try to add words such as <i>'a', 'about', 'above', 'after' or 'again'</i> to a query.</li>
-          <li>Diacritics: Accent and other character modifiers are ignored when filtering.</li>
-        </ul>
-      </span>
+        <demo-list items="[[filteredWwfInteractive]]"></demo-list>
+      </div>
 
-    </div>
 
-  </template>
+      <h3>Find turtles</h3>
+      <div class="vertical-section">
+        <marked-element>
+          <div class="markdown-html"></div>
+          <script type="text/markdown">
+            ```html
+            <poly-filter
+              array-to-filter="[ [sourceArray] ]"
+              filter="turtle"
+              filtered-array="{ {resultArray} }">
+            </poly-filter>
+            ```
+          </script>
+        </marked-element>
+
+        <poly-filter
+          array-to-filter="[[wwf]]"
+          filter="turtle"
+          filtered-array="{{filteredWwf1}}">
+        </poly-filter>
+
+        <demo-list items="[[filteredWwf1]]"></demo-list>
+      </div>
+
+
+      <h3>Only critically endangered species (searching only the `status` property)</h3>
+      <div class="vertical-section">
+        <marked-element>
+          <div class="markdown-html"></div>
+          <script type="text/markdown">
+            ```html
+            <poly-filter
+              array-to-filter="[ [sourceArray] ]"
+              filter="critically endangered"
+              filtered-array="{ {resultArray} }"
+              filter-by="status">
+            </poly-filter>
+            ```
+          </script>
+        </marked-element>
+
+        <poly-filter
+          array-to-filter="[[wwf]]"
+          filter="critically endangered"
+          filtered-array="{{filteredWwf2}}"
+          filter-by="status">
+        </poly-filter>
+
+        <demo-list items="[[filteredWwf2]]"></demo-list>
+      </div>
+
+
+      <h3>Find critically endangered Tigers (filter on multiple properties)</h3>
+      <div class="vertical-section">
+        <marked-element>
+          <div class="markdown-html"></div>
+          <script type="text/markdown">
+            ```html
+            <poly-filter
+              array-to-filter="[ [sourceArray] ]"
+              filter="critically endangered tiger"
+              filtered-array="{ {resultArray} }">
+            </poly-filter>
+            ```
+          </script>
+        </marked-element>
+
+        <poly-filter
+          array-to-filter="[[wwf]]"
+          filter="critically endangered tiger"
+          filtered-array="{{filteredWwf3}}"
+          filter-method="startsWith">
+        </poly-filter>
+
+        <demo-list items="[[filteredWwf3]]"></demo-list>
+      </div>
+
+
+      <h3>Find all where a word starts with 'delphin' or 'dolphin'</h3>
+      <div class="vertical-section">
+        <marked-element>
+          <div class="markdown-html"></div>
+          <script type="text/markdown">
+            ```html
+            <poly-filter
+              array-to-filter="[ [sourceArray] ]"
+              filter="delph OR dolphin"
+              filtered-array="{ {resultArray} }"
+              filter-method="startsWith">
+            </poly-filter>
+            ```
+          </script>
+        </marked-element>
+
+        <poly-filter
+          array-to-filter="[[wwf]]"
+          filter="delph OR dolphin"
+          filtered-array="{{filteredWwf4}}"
+          filter-method="startsWith">
+        </poly-filter>
+
+        <demo-list items="[[filteredWwf4]]"></demo-list>
+      </div>
+
+      <h3>Ignore specified words (stopWords = ['a', 'shaolin'])</h3>
+      <div class="vertical-section">
+        <marked-element>
+          <div class="markdown-html"></div>
+          <script type="text/markdown">
+            ```html
+            <poly-filter
+              array-to-filter="[ [sourceArray] ]"
+              filter="a shaolin pangolin"
+              filtered-array="{ {resultArray} }"
+              stop-words="[ [stopWords] ]">
+            </poly-filter>
+            ```
+          </script>
+        </marked-element>
+
+        <poly-filter
+          array-to-filter="[[wwf]]"
+          filter="a shaolin pangolin"
+          filtered-array="{{filteredWwf5}}"
+          stop-words="[[stopWords]]">
+        </poly-filter>
+
+        <demo-list items="[[filteredWwf5]]"></demo-list>
+      </div>
+
+
+      <h3>Find a list of coma separated animals</h3>
+      <div class="vertical-section">
+        <marked-element>
+          <div class="markdown-html"></div>
+          <script type="text/markdown">
+            ```html
+            <poly-filter
+              array-to-filter="[ [sourceArray] ]"
+              filter="bonobo, chimpanzee, orangutan"
+              filtered-array="{ {resultArray} }"
+              logical-or=",">
+            </poly-filter>
+            ```
+          </script>
+        </marked-element>
+
+        <poly-filter
+          array-to-filter="[[wwf]]"
+          filter="bonobo,chimpanzee,orangutan"
+          filtered-array="{{filteredWwf6}}"
+          logical-or=",">
+        </poly-filter>
+
+        <demo-list items="[[filteredWwf6]]"></demo-list>
+      </div>
+
+
+      <h3>Use quotes in a query to specify an exact match</h3>
+      <div class="vertical-section">
+        <marked-element>
+          <div class="markdown-html"></div>
+          <script type="text/markdown">
+            ```html
+            <poly-filter
+              array-to-filter="[ [sourceArray] ]"
+              filter='"tigris tigris"'
+              filtered-array="{ {resultArray} }">
+            </poly-filter>
+            ```
+          </script>
+        </marked-element>
+
+        <poly-filter
+          array-to-filter="[[wwf]]"
+          filter='"tigris tigris"'
+          filtered-array="{{filteredWwf7}}">
+        </poly-filter>
+
+        <demo-list items="[[filteredWwf7]]"></demo-list>
+      </div>
+
+
+      <h3>Ignore diacritics (It will find Gorillas)</h3>
+      <div class="vertical-section">
+        <marked-element>
+          <div class="markdown-html"></div>
+          <script type="text/markdown">
+            ```html
+            <poly-filter-diacritic
+              array-to-filter="[ [sourceArray] ]"
+              filter="gørìllå"
+              filtered-array="{ {resultArray} }"
+              filter-method="equals">
+            </poly-filter-diacritic>
+            ```
+          </script>
+        </marked-element>
+
+        <poly-filter-diacritic
+          array-to-filter="[[wwf]]"
+          filter="gørìllå"
+          filtered-array="{{filteredWwfDiacritic}}"
+          filter-method="equals">
+        </poly-filter-diacritic>
+
+        <demo-list items="[[filteredWwfDiacritic]]"></demo-list>
+      </div>
+
+    </template>
+
+  </div>
 
   <script>
     var demo = document.querySelector('#demo');
-    demo.filterProperties = ['code', 'name'];
-    demo.countries = [
-      {'code':'AF', 'name':'Afghanistan'},
-      {'code':'AL', 'name':'Albania'},
-      {'code':'DZ', 'name':'Algeria'},
-      {'code':'AS', 'name':'American Samoa'},
-      {'code':'AD', 'name':'Andorra'},
-      {'code':'AO', 'name':'Angola'},
-      {'code':'AI', 'name':'Anguilla'},
-      {'code':'AQ', 'name':'Antarctica'},
-      {'code':'AG', 'name':'Antigua And Barbuda'},
-      {'code':'AR', 'name':'Argentina'},
-      {'code':'AM', 'name':'Armenia'},
-      {'code':'AW', 'name':'Aruba'},
-      {'code':'AU', 'name':'Australia'},
-      {'code':'AT', 'name':'Austria'},
-      {'code':'AZ', 'name':'Azerbaijan'},
-      {'code':'BS', 'name':'Bahamas'},
-      {'code':'BH', 'name':'Bahrain'},
-      {'code':'BD', 'name':'Bangladesh'},
-      {'code':'BB', 'name':'Barbados'},
-      {'code':'BY', 'name':'Belarus'},
-      {'code':'BE', 'name':'Belgium'},
-      {'code':'BZ', 'name':'Belize'},
-      {'code':'BJ', 'name':'Benin'},
-      {'code':'BM', 'name':'Bermuda'},
-      {'code':'BT', 'name':'Bhutan'},
-      {'code':'BO', 'name':'Bolivia'},
-      {'code':'BA', 'name':'Bosnia And Herzegovina'},
-      {'code':'BW', 'name':'Botswana'},
-      {'code':'BV', 'name':'Bouvet Island'},
-      {'code':'BR', 'name':'Brazil'},
-      {'code':'IO', 'name':'British Indian Ocean Territory'},
-      {'code':'BN', 'name':'Brunei Darussalam'},
-      {'code':'BG', 'name':'Bulgaria'},
-      {'code':'BF', 'name':'Burkina Faso'},
-      {'code':'BI', 'name':'Burundi'},
-      {'code':'KH', 'name':'Cambodia'},
-      {'code':'CM', 'name':'Cameroon'},
-      {'code':'CA', 'name':'Canada'},
-      {'code':'CV', 'name':'Cape Verde'},
-      {'code':'KY', 'name':'Cayman Islands'},
-      {'code':'CF', 'name':'Central African Republic'},
-      {'code':'TD', 'name':'Chad'},
-      {'code':'CL', 'name':'Chile'},
-      {'code':'CN', 'name':'China'},
-      {'code':'CX', 'name':'Christmas Island'},
-      {'code':'CC', 'name':'Cocos (keeling) Islands'},
-      {'code':'CO', 'name':'Colombia'},
-      {'code':'KM', 'name':'Comoros'},
-      {'code':'CG', 'name':'Congo'},
-      {'code':'CD', 'name':'Congo, The Democratic Republic Of The'},
-      {'code':'CK', 'name':'Cook Islands'},
-      {'code':'CR', 'name':'Costa Rica'},
-      {'code':'CI', 'name':'Cote D\'ivoire'},
-      {'code':'HR', 'name':'Croatia'},
-      {'code':'CU', 'name':'Cuba'},
-      {'code':'CY', 'name':'Cyprus'},
-      {'code':'CZ', 'name':'Czech Republic'},
-      {'code':'DK', 'name':'Denmark'},
-      {'code':'DJ', 'name':'Djibouti'},
-      {'code':'DM', 'name':'Dominica'},
-      {'code':'DO', 'name':'Dominican Republic'},
-      {'code':'TP', 'name':'East Timor'},
-      {'code':'EC', 'name':'Ecuador'},
-      {'code':'EG', 'name':'Egypt'},
-      {'code':'SV', 'name':'El Salvador'},
-      {'code':'GQ', 'name':'Equatorial Guinea'},
-      {'code':'ER', 'name':'Eritrea'},
-      {'code':'EE', 'name':'Estonia'},
-      {'code':'ET', 'name':'Ethiopia'},
-      {'code':'FK', 'name':'Falkland Islands (malvinas)'},
-      {'code':'FO', 'name':'Faroe Islands'},
-      {'code':'FJ', 'name':'Fiji'},
-      {'code':'FI', 'name':'Finland'},
-      {'code':'FR', 'name':'France'},
-      {'code':'GF', 'name':'French Guiana'},
-      {'code':'PF', 'name':'French Polynesia'},
-      {'code':'TF', 'name':'French Southern Territories'},
-      {'code':'GA', 'name':'Gabon'},
-      {'code':'GM', 'name':'Gambia'},
-      {'code':'GE', 'name':'Georgia'},
-      {'code':'DE', 'name':'Germany'},
-      {'code':'GH', 'name':'Ghana'},
-      {'code':'GI', 'name':'Gibraltar'},
-      {'code':'GR', 'name':'Greece'},
-      {'code':'GL', 'name':'Greenland'},
-      {'code':'GD', 'name':'Grenada'},
-      {'code':'GP', 'name':'Guadeloupe'},
-      {'code':'GU', 'name':'Guam'},
-      {'code':'GT', 'name':'Guatemala'},
-      {'code':'GN', 'name':'Guinea'},
-      {'code':'GW', 'name':'Guinea-bissau'},
-      {'code':'GY', 'name':'Guyana'},
-      {'code':'HT', 'name':'Haiti'},
-      {'code':'HM', 'name':'Heard Island And Mcdonald Islands'},
-      {'code':'VA', 'name':'Holy See (vatican City State)'},
-      {'code':'HN', 'name':'Honduras'},
-      {'code':'HK', 'name':'Hong Kong'},
-      {'code':'HU', 'name':'Hungary'},
-      {'code':'IS', 'name':'Iceland'},
-      {'code':'IN', 'name':'India'},
-      {'code':'ID', 'name':'Indonesia'},
-      {'code':'IR', 'name':'Iran, Islamic Republic Of'},
-      {'code':'IQ', 'name':'Iraq'},
-      {'code':'IE', 'name':'Ireland'},
-      {'code':'IL', 'name':'Israel'},
-      {'code':'IT', 'name':'Italy'},
-      {'code':'JM', 'name':'Jamaica'},
-      {'code':'JP', 'name':'Japan'},
-      {'code':'JO', 'name':'Jordan'},
-      {'code':'KZ', 'name':'Kazakstan'},
-      {'code':'KE', 'name':'Kenya'},
-      {'code':'KI', 'name':'Kiribati'},
-      {'code':'KP', 'name':'Korea, Democratic People\'s Republic Of'},
-      {'code':'KR', 'name':'Korea, Republic Of'},
-      {'code':'KV', 'name':'Kosovo'},
-      {'code':'KW', 'name':'Kuwait'},
-      {'code':'KG', 'name':'Kyrgyzstan'},
-      {'code':'LA', 'name':'Lao People\'s Democratic Republic'},
-      {'code':'LV', 'name':'Latvia'},
-      {'code':'LB', 'name':'Lebanon'},
-      {'code':'LS', 'name':'Lesotho'},
-      {'code':'LR', 'name':'Liberia'},
-      {'code':'LY', 'name':'Libyan Arab Jamahiriya'},
-      {'code':'LI', 'name':'Liechtenstein'},
-      {'code':'LT', 'name':'Lithuania'},
-      {'code':'LU', 'name':'Luxembourg'},
-      {'code':'MO', 'name':'Macau'},
-      {'code':'MK', 'name':'Macedonia, The Former Yugoslav Republic Of'},
-      {'code':'MG', 'name':'Madagascar'},
-      {'code':'MW', 'name':'Malawi'},
-      {'code':'MY', 'name':'Malaysia'},
-      {'code':'MV', 'name':'Maldives'},
-      {'code':'ML', 'name':'Mali'},
-      {'code':'MT', 'name':'Malta'},
-      {'code':'MH', 'name':'Marshall Islands'},
-      {'code':'MQ', 'name':'Martinique'},
-      {'code':'MR', 'name':'Mauritania'},
-      {'code':'MU', 'name':'Mauritius'},
-      {'code':'YT', 'name':'Mayotte'},
-      {'code':'MX', 'name':'Mexico'},
-      {'code':'FM', 'name':'Micronesia, Federated States Of'},
-      {'code':'MD', 'name':'Moldova, Republic Of'},
-      {'code':'MC', 'name':'Monaco'},
-      {'code':'MN', 'name':'Mongolia'},
-      {'code':'MS', 'name':'Montserrat'},
-      {'code':'ME', 'name':'Montenegro'},
-      {'code':'MA', 'name':'Morocco'},
-      {'code':'MZ', 'name':'Mozambique'},
-      {'code':'MM', 'name':'Myanmar'},
-      {'code':'NA', 'name':'Namibia'},
-      {'code':'NR', 'name':'Nauru'},
-      {'code':'NP', 'name':'Nepal'},
-      {'code':'NL', 'name':'Netherlands'},
-      {'code':'AN', 'name':'Netherlands Antilles'},
-      {'code':'NC', 'name':'New Caledonia'},
-      {'code':'NZ', 'name':'New Zealand'},
-      {'code':'NI', 'name':'Nicaragua'},
-      {'code':'NE', 'name':'Niger'},
-      {'code':'NG', 'name':'Nigeria'},
-      {'code':'NU', 'name':'Niue'},
-      {'code':'NF', 'name':'Norfolk Island'},
-      {'code':'MP', 'name':'Northern Mariana Islands'},
-      {'code':'NO', 'name':'Norway'},
-      {'code':'OM', 'name':'Oman'},
-      {'code':'PK', 'name':'Pakistan'},
-      {'code':'PW', 'name':'Palau'},
-      {'code':'PS', 'name':'Palestinian Territory, Occupied'},
-      {'code':'PA', 'name':'Panama'},
-      {'code':'PG', 'name':'Papua New Guinea'},
-      {'code':'PY', 'name':'Paraguay'},
-      {'code':'PE', 'name':'Peru'},
-      {'code':'PH', 'name':'Philippines'},
-      {'code':'PN', 'name':'Pitcairn'},
-      {'code':'PL', 'name':'Poland'},
-      {'code':'PT', 'name':'Portugal'},
-      {'code':'PR', 'name':'Puerto Rico'},
-      {'code':'QA', 'name':'Qatar'},
-      {'code':'RE', 'name':'Reunion'},
-      {'code':'RO', 'name':'Romania'},
-      {'code':'RU', 'name':'Russian Federation'},
-      {'code':'RW', 'name':'Rwanda'},
-      {'code':'SH', 'name':'Saint Helena'},
-      {'code':'KN', 'name':'Saint Kitts And Nevis'},
-      {'code':'LC', 'name':'Saint Lucia'},
-      {'code':'PM', 'name':'Saint Pierre And Miquelon'},
-      {'code':'VC', 'name':'Saint Vincent And The Grenadines'},
-      {'code':'WS', 'name':'Samoa'},
-      {'code':'SM', 'name':'San Marino'},
-      {'code':'ST', 'name':'Sao Tome And Principe'},
-      {'code':'SA', 'name':'Saudi Arabia'},
-      {'code':'SN', 'name':'Senegal'},
-      {'code':'RS', 'name':'Serbia'},
-      {'code':'SC', 'name':'Seychelles'},
-      {'code':'SL', 'name':'Sierra Leone'},
-      {'code':'SG', 'name':'Singapore'},
-      {'code':'SK', 'name':'Slovakia'},
-      {'code':'SI', 'name':'Slovenia'},
-      {'code':'SB', 'name':'Solomon Islands'},
-      {'code':'SO', 'name':'Somalia'},
-      {'code':'ZA', 'name':'South Africa'},
-      {'code':'GS', 'name':'South Georgia And The South Sandwich Islands'},
-      {'code':'ES', 'name':'Spain'},
-      {'code':'LK', 'name':'Sri Lanka'},
-      {'code':'SD', 'name':'Sudan'},
-      {'code':'SR', 'name':'Suriname'},
-      {'code':'SJ', 'name':'Svalbard And Jan Mayen'},
-      {'code':'SZ', 'name':'Swaziland'},
-      {'code':'SE', 'name':'Sweden'},
-      {'code':'CH', 'name':'Switzerland'},
-      {'code':'SY', 'name':'Syrian Arab Republic'},
-      {'code':'TW', 'name':'Taiwan, Province Of China'},
-      {'code':'TJ', 'name':'Tajikistan'},
-      {'code':'TZ', 'name':'Tanzania, United Republic Of'},
-      {'code':'TH', 'name':'Thailand'},
-      {'code':'TG', 'name':'Togo'},
-      {'code':'TK', 'name':'Tokelau'},
-      {'code':'TO', 'name':'Tonga'},
-      {'code':'TT', 'name':'Trinidad And Tobago'},
-      {'code':'TN', 'name':'Tunisia'},
-      {'code':'TR', 'name':'Turkey'},
-      {'code':'TM', 'name':'Turkmenistan'},
-      {'code':'TC', 'name':'Turks And Caicos Islands'},
-      {'code':'TV', 'name':'Tuvalu'},
-      {'code':'UG', 'name':'Uganda'},
-      {'code':'UA', 'name':'Ukraine'},
-      {'code':'AE', 'name':'United Arab Emirates'},
-      {'code':'GB', 'name':'United Kingdom'},
-      {'code':'US', 'name':'United States'},
-      {'code':'UM', 'name':'United States Minor Outlying Islands'},
-      {'code':'UY', 'name':'Uruguay'},
-      {'code':'UZ', 'name':'Uzbekistan'},
-      {'code':'VU', 'name':'Vanuatu'},
-      {'code':'VE', 'name':'Venezuela'},
-      {'code':'VN', 'name':'Viet Nam'},
-      {'code':'VG', 'name':'Virgin Islands, British'},
-      {'code':'VI', 'name':'Virgin Islands, U.s.'},
-      {'code':'WF', 'name':'Wallis And Futuna'},
-      {'code':'EH', 'name':'Western Sahara'},
-      {'code':'YE', 'name':'Yemen'},
-      {'code':'ZM', 'name':'Zambia'},
-      {'code':'ZW', 'name':'Zimbabwe'}
+    demo.wwf = [
+        {name:'Amur Leopard', scientificName:'Panthera pardus orientalis', status:'Critically Endangered'},
+        {name:'Black Rhino', scientificName:'Diceros bicornis', status:'Critically Endangered'},
+        {name:'Cross River Gorilla', scientificName:'Gorilla gorilla diehli', status:'Critically Endangered'},
+        {name:'Hawksbill Turtle', scientificName:'Eretmochelys imbricata', status:'Critically Endangered'},
+        {name:'Javan Rhino', scientificName:'Rhinoceros sondaicus', status:'Critically Endangered'},
+        {name:'Leatherback Turtle', scientificName:'Dermochelys coriacea', status:'Critically Endangered'},
+        {name:'Mountain Gorilla', scientificName:'Gorilla beringei beringei', status:'Critically Endangered'},
+        {name:'Pangolin', scientificName:'', status:'Critically Endangered'},
+        {name:'Saola', scientificName:'Pseudoryx nghetinhensis', status:'Critically Endangered'},
+        {name:'South China Tiger', scientificName:'Panthera tigris amoyensis', status:'Critically Endangered'},
+        {name:'Sumatran Elephant', scientificName:'Elephas maximus sumatranus', status:'Critically Endangered'},
+        {name:'Sumatran Orangutan', scientificName:'Pongo abelii', status:'Critically Endangered'},
+        {name:'Sumatran Rhino', scientificName:'Dicerorhinus sumatrensis', status:'Critically Endangered'},
+        {name:'Sumatran Tiger', scientificName:'Panthera tigris sumatrae', status:'Critically Endangered'},
+        {name:'Vaquita', scientificName:'Phocoena sinus', status:'Critically Endangered'},
+        {name:'Western Lowland Gorilla', scientificName:'Gorilla gorilla gorilla', status:'Critically Endangered'},
+        {name:'Yangtze Finless Porpoise', scientificName:'Neophocaena asiaeorientalis ssp. asiaeorientalis', status:'Critically Endangered'},
+        {name:'African Wild Dog', scientificName:'Lycaon pictus', status:'Endangered'},
+        {name:'Amur Tiger', scientificName:'Panthera tigris altaica', status:'Endangered'},
+        {name:'Asian Elephant', scientificName:'Elephas maximus indicus', status:'Endangered'},
+        {name:'Bengal Tiger', scientificName:'Panthera tigris tigris', status:'Endangered'},
+        {name:'Black Spider Monkey', scientificName:'Ateles paniscus', status:'Endangered'},
+        {name:'Black-footed Ferret', scientificName:'Mustela nigripes', status:'Endangered'},
+        {name:'Blue Whale', scientificName:'Balaenoptera musculus', status:'Endangered'},
+        {name:'Bluefin Tuna', scientificName:'Thunnus spp', status:'Endangered'},
+        {name:'Bonobo', scientificName:'Pan paniscus', status:'Endangered'},
+        {name:'Bornean Orangutan', scientificName:'Pongo pygmaeus', status:'Endangered'},
+        {name:'Borneo Pygmy Elephant', scientificName:'Elephas maximus borneensis', status:'Endangered'},
+        {name:'Chimpanzee', scientificName:'Pan troglodytes', status:'Endangered'},
+        {name:'Eastern Lowland Gorilla', scientificName:'Gorilla beringei graueri', status:'Endangered'},
+        {name:'Fin Whale', scientificName:'Balaenoptera physalus', status:'Endangered'},
+        {name:'Galápagos Penguin', scientificName:'Spheniscus mendiculus', status:'Endangered'},
+        {name:'Ganges River Dolphin', scientificName:'Platanista gangetica gangetica', status:'Endangered'},
+        {name:'Giant Panda', scientificName:'Ailuropoda melanoleuca', status:'Endangered'},
+        {name:'Green Turtle', scientificName:'Chelonia mydas', status:'Endangered'},
+        {name:'Hector\'s Dolphin', scientificName:'Cephalorhynchus hectori', status:'Endangered'},
+        {name:'Humphead Wrasse', scientificName:'Cheilinus undulatus', status:'Endangered'},
+        {name:'Indian Elephant', scientificName:'Elephas maximus indicus', status:'Endangered'},
+        {name:'Indochinese Tiger', scientificName:'Panthera tigris corbetti', status:'Endangered'},
+        {name:'Indus River Dolphin', scientificName:'Platanista minor', status:'Endangered'},
+        {name:'Loggerhead Turtle', scientificName:'Caretta caretta', status:'Endangered'},
+        {name:'Malayan Tiger', scientificName:'Panthera tigris jacksoni', status:'Endangered'},
+        {name:'North Atlantic Right Whale', scientificName:'Eubalaena glacialis', status:'Endangered'},
+        {name:'Orangutan', scientificName:'Pongo abelii, Pongo pygmaeus', status:'Endangered'},
+        {name:'Sea Lions', scientificName:'Zalophus wollebaeki', status:'Endangered'},
+        {name:'Sei Whale', scientificName:'Balaenoptera borealis', status:'Endangered'},
+        {name:'Snow Leopard', scientificName:'Panthera uncia', status:'Endangered'},
+        {name:'Sri Lankan Elephant', scientificName:'Elephas maximus maximus', status:'Endangered'},
+        {name:'Tiger', scientificName:'Panthera tigris', status:'Endangered'},
+        {name:'Whale', scientificName:'Balaenoptera, Balaena, Eschrichtius, and Eubalaen', status:'Endangered'},
+        {name:'African Elephant', scientificName:'Loxodonta africana', status:'Vulnerable'},
+        {name:'Bigeye Tuna', scientificName:'Thunnus obesus', status:'Vulnerable'},
+        {name:'Dugong', scientificName:'Dugong dugon', status:'Vulnerable'},
+        {name:'Forest Elephant', scientificName:'', status:'Vulnerable'},
+        {name:'Giant Tortoise', scientificName:'', status:'Vulnerable'},
+        {name:'Great White Shark', scientificName:'Carcharodon carcharias', status:'Vulnerable'},
+        {name:'Greater One-Horned Rhino', scientificName:'Rhinoceros unicornis', status:'Vulnerable'},
+        {name:'Irrawaddy Dolphin', scientificName:'Orcaella brevirostris', status:'Vulnerable'},
+        {name:'Marine Iguana', scientificName:'Amblyrhynchus cristatus', status:'Vulnerable'},
+        {name:'Olive Ridley Turtle', scientificName:'Lepidochelys olivacea', status:'Vulnerable'},
+        {name:'Polar Bear', scientificName:'Ursus maritimus', status:'Vulnerable'},
+        {name:'Red Panda', scientificName:'Ailurus fulgens', status:'Vulnerable'},
+        {name:'Savanna Elephant', scientificName:'Loxodonta africana africana', status:'Vulnerable'},
+        {name:'Southern rockhopper penguin', scientificName:'Eudyptes chrysocome', status:'Vulnerable'},
+        {name:'Whale Shark', scientificName:'Rhincodon typus', status:'Vulnerable'},
+        {name:'Albacore Tuna', scientificName:'Thunnus alalunga', status:'Near Threatened'},
+        {name:'Beluga', scientificName:'Delphinapterus leucas', status:'Near Threatened'},
+        {name:'Greater Sage-Grouse', scientificName:'Centrocercus urophasianus', status:'Near Threatened'},
+        {name:'Jaguar', scientificName:'Panthera onca', status:'Near Threatened'},
+        {name:'Monarch Butterfly', scientificName:'Danaus plexippus', status:'Near Threatened'},
+        {name:'Mountain Plover', scientificName:'Charadrius montanus', status:'Near Threatened'},
+        {name:'Narwhal', scientificName:'Monodon monoceros', status:'Near Threatened'},
+        {name:'Plains Bison', scientificName:'Bison bison bison', status:'Near Threatened'},
+        {name:'White Rhino', scientificName:'Ceratotherium simum', status:'Near Threatened'},
+        {name:'Yellowfin Tuna', scientificName:'Thunnus albacares', status:'Near Threatened'},
+        {name:'Arctic Fox', scientificName:'Vulpes lagopus', status:'Least Concern'},
+        {name:'Arctic Wolf', scientificName:'Canis lupus arctos', status:'Least Concern'},
+        {name:'Bowhead Whale', scientificName:'Balaena mysticetus', status:'Least Concern'},
+        {name:'Brown Bear', scientificName:'Ursus arctos', status:'Least Concern'},
+        {name:'Common Bottlenose Dolphin', scientificName:'', status:'Least Concern'},
+        {name:'Gray Whale', scientificName:'Eschrichtius robustus', status:'Least Concern'},
+        {name:'Macaw', scientificName:'Ara ararauna', status:'Least Concern'},
+        {name:'Pronghorn', scientificName:'Antilocarpa americana', status:'Least Concern'},
+        {name:'Skipjack Tuna', scientificName:'Katsuwonus pelamis', status:'Least Concern'},
+        {name:'Swift Fox', scientificName:'Vulpes velox', status:'Least Concern'},
+        {name:'Amazon River Dolphin', scientificName:' Name Inia geoffrensis', status:''},
+        {name:'Dolphins and Porpoises', scientificName:'', status:''},
+        {name:'Elephant', scientificName:'', status:''},
+        {name:'Gorilla', scientificName:'Gorilla gorilla and Gorilla beringei', status:''},
+        {name:'Pacific Salmon', scientificName:'', status:''},
+        {name:'Penguin', scientificName:'Spheniscidae', status:''},
+        {name:'Poison Dart Frog', scientificName:'Dendrobates species', status:''},
+        {name:'Rhino', scientificName:'   '},
+        {name:'Sea Turtle', scientificName:'Cheloniidae and Dermochelyidae families', status:''},
+        {name:'Seals', scientificName:'', status:''},
+        {name:'Shark', scientificName:'', status:''},
+        {name:'Sloth', scientificName:'', status:''},
+        {name:'Tree Kangaroo', scientificName:'Dendrolagus sp.', status:''},
+        {name:'Tuna', scientificName:'Thunnus and Katsuwonus species', status:''}
     ];
+    
     demo.stopWords = [
       'a',
-      'about',
-      'above',
-      'after',
-      'again',
-      'against',
-      'all',
-      'am',
-      'an',
-      'and',
-      'any',
-      'are',
-      'aren\'t',
-      'as',
-      'at',
-      'be',
-      'because',
-      'been',
-      'before',
-      'being',
-      'below',
-      'between',
-      'both',
-      'but',
-      'by',
-      'can\'t',
-      'cannot',
-      'could',
-      'couldn\'t',
-      'did',
-      'didn\'t',
-      'do',
-      'does',
-      'doesn\'t',
-      'doing',
-      'don\'t',
-      'down',
-      'during',
-      'each',
-      'few',
-      'for',
-      'from',
-      'further',
-      'had',
-      'hadn\'t',
-      'has',
-      'hasn\'t',
-      'have',
-      'haven\'t',
-      'having',
-      'he',
-      'he\'d',
-      'he\'ll',
-      'he\'s',
-      'her',
-      'here',
-      'here\'s',
-      'hers',
-      'herself',
-      'him',
-      'himself',
-      'his',
-      'how',
-      'how\'s',
-      'i',
-      'i\'d',
-      'i\'ll',
-      'i\'m',
-      'i\'ve',
-      'if',
-      'in',
-      'into',
-      'is',
-      'isn\'t',
-      'it',
-      'it\'s',
-      'its',
-      'itself',
-      'let\'s',
-      'me',
-      'more',
-      'most',
-      'mustn\'t',
-      'my',
-      'myself',
-      'no',
-      'nor',
-      'not',
-      'of',
-      'off',
-      'on',
-      'once',
-      'only',
-      'or',
-      'other',
-      'ought',
-      'our',
-      'ours    ourselves',
-      'out',
-      'over',
-      'own',
-      'same',
-      'shan\'t',
-      'she',
-      'she\'d',
-      'she\'ll',
-      'she\'s',
-      'should',
-      'shouldn\'t',
-      'so',
-      'some',
-      'such',
-      'than',
-      'that',
-      'that\'s',
-      'the',
-      'their',
-      'theirs',
-      'them',
-      'themselves',
-      'then',
-      'there',
-      'there\'s',
-      'these',
-      'they',
-      'they\'d',
-      'they\'ll',
-      'they\'re',
-      'they\'ve',
-      'this',
-      'those',
-      'through',
-      'to',
-      'too',
-      'under',
-      'until',
-      'up',
-      'very',
-      'was',
-      'wasn\'t',
-      'we',
-      'we\'d',
-      'we\'ll',
-      'we\'re',
-      'we\'ve',
-      'were',
-      'weren\'t',
-      'what',
-      'what\'s',
-      'when',
-      'when\'s',
-      'where',
-      'where\'s',
-      'which',
-      'while',
-      'who',
-      'who\'s',
-      'whom',
-      'why',
-      'why\'s',
-      'with',
-      'won\'t',
-      'would',
-      'wouldn\'t',
-      'you',
-      'you\'d',
-      'you\'ll',
-      'you\'re',
-      'you\'ve',
-      'your',
-      'yours',
-      'yourself',
-      'yourselves'
+      'shaolin'
     ];
   </script>
 
