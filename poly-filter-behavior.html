@@ -186,6 +186,19 @@
       },
 
       /**
+       * _Only change this if you encounter performance problems._
+       *
+       * Maximum number of items processed before the browser is given a chance to 'relax'.
+       * Increase this value for faster processing, but at the risk of freezing the browser.
+       * Decrease it if you deal with very large objects and the browser is freezing during
+       * filtering or pre-processing.
+       */
+      batchNumber: {
+        type: Number,
+        value: 50
+      },
+
+      /**
        * RegExp that allows to "grab" strings between delimiters
        * in order to check for a perfect match. Default delimiters are double quotes `"`.
        * @type {RegExp}
@@ -196,17 +209,6 @@
           return /(")(?:(?=(\\?))\2.)*?\1/g;
         },
         readOnly: true
-      },
-
-      /**
-       * Maximum number of items processed before the browser is given a chance to 'relax'.
-       * Increase this value for faster processing, but at the risk of freezing the browser.
-       * Decrease it if you deal with very large objects and the browser is freezing during
-       * filtering or pre-processing.
-       */
-      _batchProcessNumber: {
-        type: Number,
-        value: 50
       }
     },
 
@@ -289,7 +291,7 @@
                 // All items processed, set the result
                 this._setFilteredArray(result);
               }
-              else if (j % this._batchProcessNumber === 0) {
+              else if (j % this.batchNumber === 0) {
                 this.async(process, 5);
               }
             }
@@ -326,7 +328,7 @@
               // All items processed, set the result
               this._set_processedArray(result);
             }
-            else if (i % this._batchProcessNumber === 0) {
+            else if (i % this.batchNumber === 0) {
               this.async(process, 5);
             }
           }
