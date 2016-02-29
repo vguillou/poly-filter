@@ -3,7 +3,18 @@
 [![Build Status](https://travis-ci.org/vguillou/poly-filter.svg?branch=master)](https://travis-ci.org/vguillou/poly-filter)
 [![GitHub version](https://badge.fury.io/gh/vguillou%2Fpoly-filter.svg)](https://badge.fury.io/gh/vguillou%2Fpoly-filter)
 
-_A fast and customizable solution for client side filtering of arrays, made for and with Polymer._
+_A fast and customizable solution for client side filtering of large arrays, built for and with Polymer._
+
+Main features:
+- Token based and case-insensitive filtering
+- Configurable matching method (`contains`, `startsWith` or `equals`)
+- Support for large arrays without browser freeze
+- Fully declarative usage with bindable filter query, source array and result array
+- Configurable item properties and subproperties to asses
+- Support for the 'Google-like' quote (") operator
+- Custimozable logical 'OR' operator
+- Stop-words support to ignore configured tokens
+- Diacritics (accents and other character modifiers) support
 
 ## Use it in your project :
 
