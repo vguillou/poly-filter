@@ -141,7 +141,7 @@
 
       
       <div class="vertical-section">
-        <h3>Find all where a word starts with 'delphin' or 'dolphin'</h3>
+        <h3>Find all where a word starts with 'delphi' or 'dolphi'</h3>
 
         <marked-element>
           <div class="markdown-html"></div>
@@ -149,7 +149,7 @@
             ```html
             <poly-filter
               array-to-filter="[ [sourceArray] ]"
-              filter="delph OR dolphin"
+              filter="delphi OR dolphi"
               filtered-array="{ {resultArray} }"
               filter-method="startsWith">
             </poly-filter>
@@ -159,7 +159,7 @@
 
         <poly-filter
           array-to-filter="[[wwf]]"
-          filter="delph OR dolphin"
+          filter="delphi OR dolphi"
           filtered-array="{{filteredWwf4}}"
           filter-method="startsWith">
         </poly-filter>
@@ -255,7 +255,7 @@
 
       
       <div class="vertical-section">
-        <h3>Ignore diacritics (It will find Gorillas)</h3>
+        <h3>Ignore diacritics (A <i>gørìllå</i> filter will still match <i>gorilla</i>)</h3>
         
         <marked-element>
           <div class="markdown-html"></div>
