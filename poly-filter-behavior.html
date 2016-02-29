@@ -9,6 +9,17 @@
    * Works with languages that do not use diacritics, such as english (see `poly-filter-diacritic`
    * or `poly-filter-diacritic-behavior` for diacritics handling).
    *
+   * Main features:
+   * - Token-based and case-insensitive filtering
+   * - Configurable matching method (`contains`, `startsWith` or `equals`)
+   * - Support for large arrays without browser freeze
+   * - Fully declarative usage with bindable filter query, source array and result array
+   * - Configurable item properties and subproperties to asses
+   * - Support for the 'Google-like' quote (") operator
+   * - Custimozable logical 'OR' operator
+   * - Stop-words support to ignore configured tokens
+   * - Diacritics (accents and other character modifiers) support (see `poly-filter-diacritic` or `poly-filter-diacritic-behavior`)
+   *
    * @polymerBehavior Polymer.PolyFilterBehavior
    */
   Polymer.PolyFilterBehavior = {

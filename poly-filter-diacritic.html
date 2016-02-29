@@ -2,8 +2,19 @@
 <link rel="import" href="poly-filter-diacritic-behavior.html">
 
 <!--
-A fast and customizable solution for client side filtering of arrays that ignores diacritics,
-made with and for Polymer.
+A fast and customizable solution for client side filtering of large arrays that ignores diacritics,
+built with and for Polymer.
+
+Main features:
+- Token based and case-insensitive filtering
+- Configurable matching method (`contains`, `startsWith` or `equals`)
+- Support for large arrays without browser freeze
+- Fully declarative usage with bindable filter query, source array and result array
+- Configurable item properties and subproperties to asses
+- Support for the 'Google-like' quote (") operator
+- Custimozable logical 'OR' operator
+- Stop-words support to ignore configured tokens
+- Diacritics (accents and other character modifiers) support
 
 Example:
 
