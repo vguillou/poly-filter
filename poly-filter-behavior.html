@@ -238,12 +238,18 @@
       if (!this.filterTokenizerRegExp) {
         throw 'filterTokenizerRegExp must not be undefined';
       }
-      this.stopWords = this.stopWords || [];
 
       this.debounce('_generateFilteredArray' + this.localName, function() {
         var filterLc = ('' + filter).toLowerCase().trim();
-        var filterMethodImpl = this._filterMethod;
-        if (filterLc.length >= (filterMinLength || 2)) {
+        if (typeof this.arrayToFilter === 'undefined' || this.arrayToFilter.length === 0) {
+          // No need to filter if the array is empty
+          this._setFilteredArray([]);
+        } else if (filterLc.length < (filterMinLength || 2)) {
+          // filter is not long enough, we appaly no filtering
+          this._setFilteredArray(this.arrayToFilter);
+        } else {
+          var filterMethodImpl = this._filterMethod;
+          this.stopWords = this.stopWords || [];
           var result = [], itemTokensAndValues, j = 0, length = this.arrayToFilter.length;
           // Fix : If odd number of quotes, we need to ignore the last one to match our logical or pattern
           var quotesCount = (filterLc.match(/\"/g) || []).length;
@@ -297,8 +303,6 @@
             }
           }.bind(this);
           process();
-        } else {
-          this._setFilteredArray(this.arrayToFilter);
         }
       }, !isNaN(filterDebounceDelay) && filterDebounceDelay > -1 ? filterDebounceDelay : 200);
     },
@@ -316,7 +320,10 @@
       }
       filterBy = this._concat([], filterBy);
       stopWords = stopWords || [];
-      if (arrayToFilter) {
+      if (typeof arrayToFilter === 'undefined' || arrayToFilter.length === 0) {
+         // The array to filter is empty or undefined, nothing to pre-process
+        this._set_processedArray([]);
+      } else {
         var result = [], item, i = 0, length = arrayToFilter.length;
         var process = function() {
           for (; i < length; i++) {

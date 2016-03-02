@@ -32,8 +32,8 @@
   </test-fixture>
 
 <script>
-
-  suite('<poly-filter>', function() {
+  var domParamArray = window.location.search.split('dom=');
+  suite('<poly-filter>' + (domParamArray.length === 2 ? ' dom=' + domParamArray[1] : ''), function() {
 
     suite('basic filtering', function() {
       var polyFilter;
@@ -103,6 +103,29 @@
           expect(polyFilter.filteredArray.length).to.be.equal(1);
           expect(polyFilter.filteredArray[0].code).to.be.equal('LU');
           expect(polyFilter.filteredArray[0].name).to.be.equal('Luxembourg');
+          done();
+        };
+
+        runStep(polyFilter, step1);
+      });
+
+      test('set empty array-to-filter', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          runStep(polyFilter, step2);
+          polyFilter.filter = 'seychelles';
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          runStep(polyFilter, step3);
+          polyFilter.arrayToFilter = [];
+        };
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.arrayToFilter.length).to.be.equal(0);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
           done();
         };
 
