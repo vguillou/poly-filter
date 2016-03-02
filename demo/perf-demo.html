@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>poly-filter demo</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="msapplication-TileColor" content="#ff5722">
+  <meta name="theme-color" content="#ff5722">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../iron-ajax/iron-ajax.html">
+  <link rel="import" href="../../iron-list/iron-list.html">
+  <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+  <link rel="import" href="../poly-filter.html">
+  <link rel="import" href="demo-list.html">
+
+  <style is="custom-style">
+    body {
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      @apply(--layout-fit);
+    }
+
+    .main-container {
+      max-width: 700px;
+      margin: 0 auto;
+      height: 100%;
+    }
+
+    .vertical-section {
+      margin: 0 8px;
+      height: 100%;
+      @apply(--layout-vertical);
+    }
+
+    h3 {
+      margin-bottom: 0px;
+    }
+
+    p {
+      font-weight: bold;
+    }
+
+    iron-list {
+      min-height: 35px;
+      margin: 8px 15px;
+      border-style: solid;
+      @apply(--layout-flex);
+    }
+
+    .item {
+      min-height: 30px;
+      border-bottom: 1px solid #e0e0e0;
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
+    }
+
+    .item > * {
+      margin: 0 6px;
+    }
+
+    .item .name {
+    }
+
+    .item .company {
+      font-style: italic;
+      font-size: 0.7em;
+      @apply(--layout-flex);
+    }
+
+    .item .phone {
+      font-weight: bold;
+      text-align: end;
+    }
+  </style>
+</head>
+  
+<body unresolved>
+  
+  <div class="main-container">
+
+    <template is="dom-bind" id="demo">
+
+      <iron-ajax
+        id="ajax"
+        auto
+        url="dataset.json"
+        handle-as="json"
+        last-response="{{dataset}}"
+        on-response="datasetLoaded">
+      </iron-ajax>
+
+      <div class="vertical-section">
+        <h3>Performance demo:</h3>
+        <p>Loading a ~10mo JSON descriding 10000 complex objects with more than properties/subproperties. We will filter them all.</p>
+
+        <poly-filter
+          array-to-filter="[[dataset]]"
+          filter="[[filterString]]"
+          filtered-array="{{filteredDataset}}">
+        </poly-filter>
+
+        <div>
+          <span>Filter:</span>
+          <input type="string" value="{{filterString::input}}" autofocus>
+          <span id="loadingMessage" hidden$="[[loaded]]">Loading...</span>
+        </div>
+
+        <iron-list id="list" items="[[filteredDataset]]" as="data" hidden$="[[!loaded]]">
+          <template>
+            <div class="item">
+              <span class="name">[[data.name]]</span>
+              <span class="company">([[data.company]])</span>
+              <span class="phone">[[data.phone]]</span>
+            </div>
+          </template>
+        </iron-list>
+      </div>
+
+    </template>
+
+  </div>
+
+  <script>
+    var demo = document.querySelector('#demo');
+    demo.loaded = false;
+
+    demo.datasetLoaded = function() {
+      demo.loaded = true;
+    };
+  </script>
+
+</body>
+</html>

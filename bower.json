@@ -26,7 +26,8 @@
     "res",
     "node_modules",
     "bower_components",
-    "test"
+    "test",
+    "demo/dataset.json"
   ],
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "js-replace-diacritics": "yvg/js-replace-diacritics#master"
   },
   "devDependencies": {
+    "iron-ajax": "PolymerElements/iron-ajax#^1.1.1",
     "iron-component-page": "PolymerElements/iron-component-page#^1.1.4",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.2.3",
     "iron-list": "PolymerElements/iron-list#^1.2.5",

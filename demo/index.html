@@ -39,6 +39,12 @@
     <template is="dom-bind" id="demo">
 
       <div class="vertical-section">
+        <h3><a href="perf-demo.html">Performance demo (~10mo JSON and 10000 complex objects)</a></h3>
+      </div>
+
+      
+
+      <div class="vertical-section">
         <h3>Interactive demo</h3>
 
         <poly-filter
@@ -48,7 +54,7 @@
         </poly-filter>
 
         <span>Filter endangered animals:
-            <input type="string" value="{{filterString::input}}" autofocus>
+          <input type="string" value="{{filterString::input}}" autofocus>
         </span>
 
         <demo-list items="[[filteredWwfInteractive]]"></demo-list>

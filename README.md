@@ -28,4 +28,4 @@ use this command
 
 Please refer to the <a href="https://vguillou.github.io/webcomponents/poly-filter">component page</a> for more informations.
 
-Demos available <a href="https://vguillou.github.io/webcomponents/poly-filter/demo">here</a>.
+Here are the direct links to the <a href="https://vguillou.github.io/webcomponents/poly-filter/demo">feature demo</a> and the <a href="https://vguillou.github.io/webcomponents/poly-filter/demo/perf-demo.html">performance demo</a>.
