@@ -16,6 +16,7 @@ Main features:
 - Stop-words support to ignore configured tokens
 - Diacritics (accents and other character modifiers) support
 
+
 ## Use it in your project :
 
 Element dependencies are managed via [Bower](http://bower.io/). To install this element,
@@ -29,3 +30,8 @@ use this command
 Please refer to the <a href="https://vguillou.github.io/webcomponents/poly-filter">component page</a> for more informations.
 
 Here are the direct links to the <a href="https://vguillou.github.io/webcomponents/poly-filter/demo">feature demo</a> and the <a href="https://vguillou.github.io/webcomponents/poly-filter/demo/perf-demo.html">performance demo</a>.
+
+
+## License
+
+[MIT License](http://opensource.org/licenses/MIT)
