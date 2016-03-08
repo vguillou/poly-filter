@@ -34,4 +34,4 @@ Here are the direct links to the <a href="https://vguillou.github.io/webcomponen
 
 ## License
 
-[MIT License](http://opensource.org/licenses/MIT)
+[MIT License](https://github.com/vguillou/poly-filter/blob/master/LICENSE.md)
