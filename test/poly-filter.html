@@ -22,15 +22,6 @@
     </template>
   </test-fixture>
 
-  <test-fixture id="LastnamePropertyPolyFilter">
-    <template>
-      <poly-filter
-        filter-max-depth="1"
-        filter-by="lastname">
-      </poly-filter>
-    </template>
-  </test-fixture>
-
 <script>
   var domParamArray = window.location.search.split('dom=');
   suite('<poly-filter>' + (domParamArray.length === 2 ? ' dom=' + domParamArray[1] : ''), function() {
@@ -355,13 +346,61 @@
         runStep(polyFilter, step1);
       });
 
-      test('removing stop-words', function(done) {
+      test('removing stop-words entirely', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(1);
           expect(polyFilter.filteredArray[0].code).to.be.equal('IS');
           expect(polyFilter.filteredArray[0].name).to.be.equal('Iceland');
           polyFilter.stopWords = [];
+          runStep(polyFilter, step2);
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          done();
+        };
+
+        polyFilter.stopWords = stopWords;
+        polyFilter.filter = 'I have a ice dream';
+        runStep(polyFilter, step1);
+      });
+
+      test('add and remove a stop-word', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('IS');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Iceland');
+          polyFilter.push('stopWords', 'ice');
+          runStep(polyFilter, step2);
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          polyFilter.splice('stopWords', polyFilter.stopWords.length-1, 1);
+          runStep(polyFilter, step3);
+        };
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('IS');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Iceland');
+          done();
+        };
+
+        polyFilter.stopWords = stopWords;
+        polyFilter.filter = 'I have a ice dream';
+        runStep(polyFilter, step1);
+      });
+
+      test('undefined stop-words', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('IS');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Iceland');
+          polyFilter.stopWords = undefined;
           runStep(polyFilter, step2);
         };
         var step2 = function(e) {
@@ -456,20 +495,75 @@
       });
 
       test('one property only', function(done) {
-        var onePropertyFilter = fixture('LastnamePropertyPolyFilter');
-        onePropertyFilter.arrayToFilter = complexArray;
-        onePropertyFilter.filter = '';
-        
         var step1 = function(e) {
-          finishStep(onePropertyFilter, step1);
-          expect(onePropertyFilter.filteredArray.length).to.be.equal(1);
-          expect(onePropertyFilter.filteredArray[0].lastname).to.be.equal('Holmes');
-          expect(onePropertyFilter.filteredArray[0].job.title).to.be.equal('detective');
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(2);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Doe');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('unknown');
+          expect(polyFilter.filteredArray[1].lastname).to.be.equal('Holmes');
+          expect(polyFilter.filteredArray[1].job.title).to.be.equal('detective');
           done();
         };
 
-        onePropertyFilter.filter = 'foobar OR Holm';
-        runStep(onePropertyFilter, step1);
+        polyFilter.filterBy = 'lastname';
+        polyFilter.filter = 'doe OR Holm OR bartender';
+        runStep(polyFilter, step1);
+      });
+
+      test('add and remove properties', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          polyFilter.push('filterBy', 'title');
+          runStep(polyFilter, step2);
+        };
+
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Foo');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('bartender');
+          polyFilter.splice('filterBy', polyFilter.filterBy.length-1, 1);
+          runStep(polyFilter, step3);
+        };
+
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          done();
+        };
+
+        polyFilter.filterBy = ['lastname', 'job'];
+        polyFilter.filter = 'bartender';
+        runStep(polyFilter, step1);
+      });
+
+      test('set undefined filter-by', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          polyFilter.filterBy = undefined;
+          runStep(polyFilter, step2);
+        };
+
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Foo');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('bartender');
+          polyFilter.filterBy = 'lastname';
+          runStep(polyFilter, step3);
+        };
+
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          done();
+        };
+
+        polyFilter.filterBy = ['lastname', 'job'];
+        polyFilter.filter = 'bartender';
+        runStep(polyFilter, step1);
       });
     });
 
@@ -560,7 +654,7 @@
       teardown(function() {
       });
 
-      test('set empty array', function(done) {
+      test('set empty array-to-filter', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(241);
@@ -583,7 +677,7 @@
         runStep(polyFilter, step1);
       });
 
-      test('set undefined', function(done) {
+      test('set undefined array-to-filter', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(241);

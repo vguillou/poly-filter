@@ -34,7 +34,7 @@
         value: function() {
           return [];
         },
-        observer: '_arrayToFilterChanged'
+        observer: '_launchProcessArray'
       },
 
       /**
@@ -63,7 +63,7 @@
       filter: {
         type: String,
         value: undefined,
-        observer: '_filterChanged'
+        observer: '_launchGenerateFilteredArray'
       },
 
       /**
@@ -107,7 +107,8 @@
         type: Object,
         value: function() {
           return [];
-        }
+        },
+        observer: '_launchProcessArray'
       },
 
       /**
@@ -155,7 +156,8 @@
         type: Array,
         value: function() {
           return [];
-        }
+        },
+        observer: '_launchProcessArray'
       },
 
       /**
@@ -218,7 +220,7 @@
     },
 
     observers: [
-      '_processArray(arrayToFilter.*, filterBy, filterTokenizerRegExp, filterMaxDepth, stopWords)',
+      '_processArray(arrayToFilter.*, filterBy.*, filterTokenizerRegExp, filterMaxDepth, stopWords.*)',
       '_generateFilteredArray(_processedArray, filterMinLength, filterDebounceDelay, logicalOr, filterMethod, _exactStringDelimiterRegExp)'
     ],
 
@@ -236,16 +238,12 @@
       return method;
     },
 
-    _filterChanged: function() {
+    _launchGenerateFilteredArray: function() {
       this._generateFilteredArray(this._processedArray, this.filterMinLength, this.filterDebounceDelay, this.logicalOr, this.filterMethod, this._exactStringDelimiterRegExp);
     },
 
-    _arrayToFilterChanged: function(newValue) {
-      // Handling only 'undefined', the other case will be picked-up by
-      // the global observer (observing 'arrayToFilter.*')
-      if (typeof newValue === 'undefined') {
-        this._setFilteredArray([]);
-      }
+    _launchProcessArray: function() {
+      this._processArray({base: this.arrayToFilter}, {base: this.filterBy}, this.filterTokenizerRegExp, this.filterMaxDepth, {base: this.stopWords});
     },
 
     /**
@@ -265,7 +263,7 @@
           this._setFilteredArray(this.arrayToFilter.slice());
         } else {
           var filterMethodImpl = this._filterMethod;
-          this.stopWords = this.stopWords || [];
+          var stopWords = this.stopWords || [];
           var result = [], itemTokensAndValues, j = 0, length = this.arrayToFilter.length;
           // Fix : If odd number of quotes, we need to ignore the last one to match our logical or pattern
           var quotesCount = (filterLc.match(/\"/g) || []).length;
@@ -288,7 +286,7 @@
               filterPartsTokens.push({
                 values: exactStrings,
                 // tokenize the rest
-                tokens: this._processValue(filterPart, this.filterTokenizerRegExp, this.stopWords)
+                tokens: this._processValue(filterPart, this.filterTokenizerRegExp, stopWords)
               });
             }
           }
@@ -327,7 +325,7 @@
      * From a given `arrayToFilter`, produce a 'twin' array of by breaking specified
      * item's properties into a flattened array of normalized tokens without stop-words.
      */
-    _processArray: function(arrayToFilterChanges, filterBy, filterTokenizerRegExp, filterMaxDepth, stopWords) {
+    _processArray: function(arrayToFilterChanges, filterByChanges, filterTokenizerRegExp, filterMaxDepth, stopWordsChanges) {
       this.debounce('_processArray' + this.localName, function() {
         var arrayToFilter = arrayToFilterChanges.base;
         if (!filterTokenizerRegExp) {
@@ -336,8 +334,8 @@
         if (!(filterMaxDepth > -1)) {
           throw 'filterMaxDepth (' + filterMaxDepth + ') must be a valid number >= 0';
         }
-        filterBy = this._concat([], filterBy);
-        stopWords = stopWords || [];
+        var filterBy = this._concat([], filterByChanges.base);
+        var stopWords = stopWordsChanges.base || [];
         if (typeof arrayToFilter === 'undefined' || arrayToFilter.length === 0) {
            // The array to filter is empty or undefined, nothing to pre-process
           this._set_processedArray([]);
