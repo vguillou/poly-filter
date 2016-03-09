@@ -109,23 +109,30 @@
         runStep(polyFilter, step1);
       });
 
-      test('set empty array-to-filter', function(done) {
+      test('undefined filter', function(done) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(241);
           runStep(polyFilter, step2);
-          polyFilter.filter = 'seychelles';
+          polyFilter.filter = 'bar';
         };
         var step2 = function(e) {
           finishStep(polyFilter, step2);
-          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
           runStep(polyFilter, step3);
-          polyFilter.arrayToFilter = [];
+          polyFilter.filter = undefined;
         };
         var step3 = function(e) {
           finishStep(polyFilter, step3);
-          expect(polyFilter.arrayToFilter.length).to.be.equal(0);
-          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          runStep(polyFilter, step4);
+          polyFilter.filter = 'uxe';
+        };
+        var step4 = function(e) {
+          finishStep(polyFilter, step4);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('LU');
+          expect(polyFilter.filteredArray[0].name).to.be.equal('Luxembourg');
           done();
         };
 
@@ -540,6 +547,156 @@
         polyFilter.filter = 'island';
         runStep(polyFilter, step1);
       });
+    });
+
+    suite('modify array-to-filter', function() {
+      var polyFilter;
+
+      setup(function() {
+        polyFilter = fixture('BasicPolyFilter');
+        polyFilter.arrayToFilter = countries.slice();
+      });
+
+      teardown(function() {
+      });
+
+      test('set empty array', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          runStep(polyFilter, step2);
+          polyFilter.filter = 'seychelles';
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          runStep(polyFilter, step3);
+          polyFilter.arrayToFilter = [];
+        };
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.arrayToFilter.length).to.be.equal(0);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          done();
+        };
+
+        runStep(polyFilter, step1);
+      });
+
+      test('set undefined', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          runStep(polyFilter, step2);
+          polyFilter.filter = 'seychelles';
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          runStep(polyFilter, step3);
+          polyFilter.arrayToFilter = undefined;
+        };
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.arrayToFilter).to.be.an('undefined');
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          done();
+        };
+
+        runStep(polyFilter, step1);
+      });
+
+      test('add an item', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(2);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('IO');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('VG');
+          runStep(polyFilter, step2);
+          polyFilter.push('arrayToFilter', {'code':'BZH', 'name':'Brittany'});
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
+          expect(polyFilter.filteredArray[2].code).to.be.equal('BZH');
+          runStep(polyFilter, step3);
+          polyFilter.filter = '';
+        };
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(242);
+          done();
+        };
+
+        polyFilter.filter = 'brit';
+        runStep(polyFilter, step1);
+      });
+
+      test('remove an item', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(2);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('AL');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('SJ');
+          runStep(polyFilter, step2);
+          polyFilter.splice('arrayToFilter', 1, 1);
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('SJ');
+          runStep(polyFilter, step3);
+          polyFilter.filter = '';
+        };
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(240);
+          done();
+        };
+
+        polyFilter.filter = 'alb';
+        runStep(polyFilter, step1);
+      });
+
+      test('modify an item (manual call to `notifyPath(...)`)', function(done) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('AQ');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('AG');
+          expect(polyFilter.filteredArray[2].code).to.be.equal('AN');
+          runStep(polyFilter, step2);
+          polyFilter.arrayToFilter[7].name = 'Arctica';
+          polyFilter.notifyPath('arrayToFilter', polyFilter.arrayToFilter.slice());
+        };
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(2);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('AG');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('AN');
+          runStep(polyFilter, step3);
+          polyFilter.arrayToFilter[7].name = 'Antarctica';
+          polyFilter.notifyPath('arrayToFilter', polyFilter.arrayToFilter.slice());
+        };
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(3);
+          expect(polyFilter.filteredArray[0].code).to.be.equal('AQ');
+          expect(polyFilter.filteredArray[1].code).to.be.equal('AG');
+          expect(polyFilter.filteredArray[2].code).to.be.equal('AN');
+          runStep(polyFilter, step4);
+          polyFilter.filter = '';
+        };
+        var step4 = function(e) {
+          finishStep(polyFilter, step4);
+          expect(polyFilter.filteredArray.length).to.be.equal(241);
+          done();
+        };
+
+        polyFilter.filter = 'ant';
+        runStep(polyFilter, step1);
+      });
+
     });
 
     var runStep = function(el, step) {
