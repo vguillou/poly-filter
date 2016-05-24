@@ -1,22 +1,17 @@
 language: node_js
-sudo: false
+sudo: required
+before_script:
+  - npm install -g bower polylint web-component-tester
+  - bower install
+  - polylint
+node_js: stable
 addons:
   firefox: latest
   apt:
     sources:
       - google-chrome
-      - ubuntu-toolchain-r-test
     packages:
       - google-chrome-stable
-      - g++-4.8
-node_js: stable
-env:
-  global:
-    - CXX=g++-4.8
-    - DISPLAY=99.0
-before_script:
-  - npm install -g bower polylint web-component-tester
-  - bower install
-  - polylint
 script:
-  - xvfb-run wct
+  - xvfb-run wct --skip-plugin sauce
+dist: trusty
