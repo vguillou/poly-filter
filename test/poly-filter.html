@@ -56,7 +56,7 @@
           expect(polyFilter.filteredArray.length).to.be.equal(241);
           done();
         };
-        
+
         runStep(polyFilter, step1);
       });
 
@@ -204,7 +204,7 @@
           expect(polyFilter.filteredArray[0].name).to.be.equal('Liechtenstein');
           done();
         };
-        
+
         polyFilter.filter = '"liech" or "repub of';
         runStep(polyFilter, step1);
       });
@@ -463,7 +463,77 @@
       teardown(function() {
       });
 
-      test('ignore properties left out', function(done) {
+      doTestOnePropertyOnly = function(done, asString) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(2);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Doe');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('unknown');
+          expect(polyFilter.filteredArray[1].lastname).to.be.equal('Holmes');
+          expect(polyFilter.filteredArray[1].job.title).to.be.equal('detective');
+          done();
+        };
+
+        var propName = 'lastname';
+        polyFilter.filterBy = asString ? propName : [propName];
+        polyFilter.filter = 'doe OR Holm OR bartender';
+        runStep(polyFilter, step1);
+      };
+
+      test('one property only (array)', function(done) {
+        doTestOnePropertyOnly(done, false);
+      });
+
+      test('one property only (string)', function(done) {
+        doTestOnePropertyOnly(done, true);
+      });
+
+      doTestAddAndRemoveProperties = function(done, asString) {
+        var propNameToAdd = 'job.title';
+
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          if (asString)
+            polyFilter.filterBy += (',' + propNameToAdd);
+          else
+            polyFilter.push('filterBy', propNameToAdd);
+          runStep(polyFilter, step2);
+        };
+
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Foo');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('bartender');
+          if (asString)
+            polyFilter.filterBy = polyFilter.filterBy.slice(0, propNameToAdd.length + 1);
+          else
+            polyFilter.splice('filterBy', polyFilter.filterBy.length-1, 1);
+          runStep(polyFilter, step3);
+        };
+
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          done();
+        };
+
+        var propName = 'lastname';
+        polyFilter.filterBy = asString ? propName : [propName];
+        polyFilter.filter = 'bartender';
+        runStep(polyFilter, step1);
+      };
+
+      test('add and remove properties (as array)', function(done) {
+        doTestAddAndRemoveProperties(done, false);
+      });
+
+      test('add and remove properties (as string)', function(done) {
+        doTestAddAndRemoveProperties(done, true);
+      });
+
+      doTestIgnorePropertiesLeftOut = function(done, asString) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(2);
@@ -472,13 +542,13 @@
           expect(polyFilter.filteredArray[0].job.company.name).to.be.equal('mystery');
           expect(polyFilter.filteredArray[1].lastname).to.be.equal('Holmes');
           expect(polyFilter.filteredArray[1].job.title).to.be.equal('detective');
-          polyFilter.filterBy = ['lastname', 'job', 'company', 'name'];
+          polyFilter.filterBy = asString ? 'lastname, job.company.name' : ['lastname', 'job.company.name'];
           runStep(polyFilter, step2);
         };
         var step2 = function(e) {
           finishStep(polyFilter, step2);
           expect(polyFilter.filteredArray.length).to.be.equal(0);
-          polyFilter.filterBy = ['lastname', 'job', 'title', 'company', 'name'];
+          polyFilter.filterBy = asString ? 'lastname, job.company.name, job.title' : ['lastname', 'job.company.name', 'job.title'];
           runStep(polyFilter, step3);
         };
         var step3 = function(e) {
@@ -492,78 +562,223 @@
 
         polyFilter.filter = '221B OR unknow';
         runStep(polyFilter, step1);
+      };
+
+      test('ignore properties left out (array)', function(done) {
+        doTestIgnorePropertiesLeftOut(done, false);
       });
 
-      test('one property only', function(done) {
+      test('ignore properties left out (string)', function(done) {
+        doTestIgnorePropertiesLeftOut(done, true);
+      });
+
+      doTestResetFilterBy = function(done, asString, empty) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          polyFilter.filterBy = empty ? (asString ? '' : []) : undefined;
+          runStep(polyFilter, step2);
+        };
+
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Foo');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('bartender');
+          var propName = 'lastname';
+          polyFilter.filterBy = asString ? propName : [propName];
+          runStep(polyFilter, step3);
+        };
+
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          done();
+        };
+
+        polyFilter.filterBy = asString ? 'lastname, title' : ['lastname', 'title'];
+        polyFilter.filter = 'bartender';
+        runStep(polyFilter, step1);
+      };
+
+      test('set undefined filter-by (as array)', function(done) {
+        doTestResetFilterBy(done, false, false);
+      });
+
+      test('set undefined filter-by (as string)', function(done) {
+        doTestResetFilterBy(done, true, false);
+      });
+
+      test('set empty filter-by (as array)', function(done) {
+        doTestResetFilterBy(done, false, true);
+      });
+
+      test('set empty filter-by (as string)', function(done) {
+        doTestResetFilterBy(done, true, false);
+      });
+
+      doTestFilterOnAnObjectProperty = function(done, asString) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          var propName = 'job';
+          polyFilter.filterBy = asString ? propName : [propName];
+          runStep(polyFilter, step2);
+        };
+
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Holmes');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('detective');
+          done();
+        };
+
+        var propName = 'lastname';
+        polyFilter.filterBy = asString ? propName : [propName];
+        polyFilter.filter = 'detective';
+        runStep(polyFilter, step1);
+      };
+
+      test('filter on an object property (as array)', function(done) {
+        doTestFilterOnAnObjectProperty(done, false);
+      });
+
+      test('filter on an object property (as string)', function(done) {
+        doTestFilterOnAnObjectProperty(done, true);
+      });
+
+      doTestFilterOnAnArrayProperty = function(done, asString) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          var propNameToAdd = 'job.company.tags';
+          if (asString)
+            polyFilter.filterBy += (',' + propNameToAdd);
+          else
+            polyFilter.push('filterBy', propNameToAdd);
+          runStep(polyFilter, step2);
+        };
+
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Holmes');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('detective');
+          polyFilter.filter = 'wow such';
+          runStep(polyFilter, step3);
+        };
+
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Foo');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('bartender');
+          done();
+        };
+
+        var propName = 'lastname';
+        polyFilter.filterBy = asString ? propName : [propName];
+        polyFilter.filter = 'private';
+        runStep(polyFilter, step1);
+      };
+
+      test('filter on an array property (as array)', function(done) {
+        doTestFilterOnAnArrayProperty(done, false);
+      });
+
+      test('filter on an array property (as string)', function(done) {
+        doTestFilterOnAnArrayProperty(done, true);
+      });
+
+      doTestFilterOnAnArrayOfObjectsFull = function(done, asString) {
+        var step1 = function(e) {
+          finishStep(polyFilter, step1);
+          expect(polyFilter.filteredArray.length).to.be.equal(0);
+          var propNameToAdd = 'job.company.test';
+          if (asString)
+            polyFilter.filterBy += (',' + propNameToAdd);
+          else
+            polyFilter.push('filterBy', propNameToAdd);
+          runStep(polyFilter, step2);
+        };
+
+        var step2 = function(e) {
+          finishStep(polyFilter, step2);
           expect(polyFilter.filteredArray.length).to.be.equal(2);
           expect(polyFilter.filteredArray[0].lastname).to.be.equal('Doe');
           expect(polyFilter.filteredArray[0].job.title).to.be.equal('unknown');
           expect(polyFilter.filteredArray[1].lastname).to.be.equal('Holmes');
           expect(polyFilter.filteredArray[1].job.title).to.be.equal('detective');
+          polyFilter.filter = 'wow such';
+          runStep(polyFilter, step3);
+        };
+
+        var step3 = function(e) {
+          finishStep(polyFilter, step3);
+          expect(polyFilter.filteredArray.length).to.be.equal(1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Foo');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('bartender');
           done();
         };
 
-        polyFilter.filterBy = 'lastname';
-        polyFilter.filter = 'doe OR Holm OR bartender';
+        var propName = 'lastname';
+        polyFilter.filterBy = asString ? propName : [propName];
+        polyFilter.filter = 'secret';
+        polyFilter.filterMaxDepth = 5;
         runStep(polyFilter, step1);
+      };
+
+      test('filter on an array of objects (as array)', function(done) {
+        doTestFilterOnAnArrayOfObjectsFull(done, false);
       });
 
-      test('add and remove properties', function(done) {
+      test('filter on an array of objects (as string)', function(done) {
+        doTestFilterOnAnArrayOfObjectsFull(done, true);
+      });
+
+      doTestFilterOnAnArrayOfObjectsOneProp = function(done, asString) {
         var step1 = function(e) {
           finishStep(polyFilter, step1);
           expect(polyFilter.filteredArray.length).to.be.equal(0);
-          polyFilter.push('filterBy', 'title');
+          var propNameToAdd = 'job.company.test.alt';
+          if (asString)
+            polyFilter.filterBy += (',' + propNameToAdd);
+          else
+            polyFilter.push('filterBy', propNameToAdd);
           runStep(polyFilter, step2);
         };
 
         var step2 = function(e) {
           finishStep(polyFilter, step2);
           expect(polyFilter.filteredArray.length).to.be.equal(1);
-          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Foo');
-          expect(polyFilter.filteredArray[0].job.title).to.be.equal('bartender');
-          polyFilter.splice('filterBy', polyFilter.filterBy.length-1, 1);
+          expect(polyFilter.filteredArray[0].lastname).to.be.equal('Holmes');
+          expect(polyFilter.filteredArray[0].job.title).to.be.equal('detective');
+          polyFilter.filter = 'very testing';
           runStep(polyFilter, step3);
         };
 
         var step3 = function(e) {
           finishStep(polyFilter, step3);
-          expect(polyFilter.filteredArray.length).to.be.equal(0);
-          done();
-        };
-
-        polyFilter.filterBy = ['lastname', 'job'];
-        polyFilter.filter = 'bartender';
-        runStep(polyFilter, step1);
-      });
-
-      test('set undefined filter-by', function(done) {
-        var step1 = function(e) {
-          finishStep(polyFilter, step1);
-          expect(polyFilter.filteredArray.length).to.be.equal(0);
-          polyFilter.filterBy = undefined;
-          runStep(polyFilter, step2);
-        };
-
-        var step2 = function(e) {
-          finishStep(polyFilter, step2);
           expect(polyFilter.filteredArray.length).to.be.equal(1);
           expect(polyFilter.filteredArray[0].lastname).to.be.equal('Foo');
           expect(polyFilter.filteredArray[0].job.title).to.be.equal('bartender');
-          polyFilter.filterBy = 'lastname';
-          runStep(polyFilter, step3);
-        };
-
-        var step3 = function(e) {
-          finishStep(polyFilter, step3);
-          expect(polyFilter.filteredArray.length).to.be.equal(0);
           done();
         };
 
-        polyFilter.filterBy = ['lastname', 'job'];
-        polyFilter.filter = 'bartender';
+        var propName = 'lastname';
+        polyFilter.filterBy = asString ? propName : [propName];
+        polyFilter.filter = 'renowned';
+        polyFilter.filterMaxDepth = 5;
         runStep(polyFilter, step1);
+      };
+
+      test('filter on an array of objects on only one property (as array)', function(done) {
+        doTestFilterOnAnArrayOfObjectsOneProp(done, false);
+      });
+
+      test('filter on an array of objects on only one property (as string)', function(done) {
+        doTestFilterOnAnArrayOfObjectsOneProp(done, true);
       });
     });
 
@@ -636,7 +851,7 @@
           expect(polyFilter.filteredArray.length).to.be.equal(4);
           done();
         };
-        
+
         polyFilter.filterMethod = 'contains';
         polyFilter.filter = 'island';
         runStep(polyFilter, step1);
@@ -802,19 +1017,28 @@
     };
 
     var complexArray = [
-      {'lastname': 'Foo', 'job': 
+      {'lastname': 'Foo', 'job':
         {'title': 'bartender', 'company':
-          {'name': 'foobar', 'address': '1 Foobar Street'}
+          {'name': 'foobar', 'address': '1 Foobar Street',
+            'tags': ['wow', 'such', 'test'],
+            'test': [{'tag': 'wow', 'alt': undefined}, {'tag': 'such', 'alt': 'very'}, {'tag': 'test', 'alt': 'testing'}]
+          }
         }
       },
-      {'lastname': 'Doe', 'job': 
+      {'lastname': 'Doe', 'job':
         {'title': 'unknown', 'company':
-          {'name': 'mystery', 'address': '42 Enigma Avenue'}
+          {'name': 'mystery', 'address': '42 Enigma Avenue',
+            'tags': ['anonymous'],
+            'test': [{'tag' : 'anonymous', 'alt': 'secret'}]
+          }
         }
       },
-      {'lastname': 'Holmes', 'job': 
+      {'lastname': 'Holmes', 'job':
         {'title': 'detective', 'company':
-          {'name': 'Sherlock Holmes', 'address': '221B Baker Street'}
+          {'name': 'Sherlock Holmes', 'address': '221B Baker Street',
+            'tags': ['famous', 'private', 'detective'],
+            'test': [{'tag' : 'famous', 'alt': 'renowned'}, {'tag' : 'private', 'alt': 'secret'}, {'tag' : 'detective', 'alt': 'sleuth'}]
+          }
         }
       }
     ];

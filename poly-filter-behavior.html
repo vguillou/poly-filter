@@ -34,7 +34,7 @@
         value: function() {
           return [];
         },
-        observer: '_launchProcessArray'
+        observer: '_processArrayIfNewValUndefined'
       },
 
       /**
@@ -83,24 +83,38 @@
       },
 
       /**
-       * Single property (`String`) or list (`Array`) of the item's properties
+       * List (`Array` or comma separated `String`) of the item's properties
        * to take into account for the filtering.
        *
        * Example:
-       * If the items in `arrayToFilter` represents countries with these properties :
-       *     
-       *     {'code': 'FR', 'name': 'France', 'language': 'French'}
-       *     
-       * and you only want to filter your array based on the `name` and `code`, you must set
-       * `filterBy` to :
-       *     
-       *     ['code', 'name']
+       * If the items in `arrayToFilter` represents characters with such properties:
        *
-       * ***Special cases :***
-       * - If an empty `Array`, item's in `arrayToFilter` will be filtered based
+       *     {'firstname': 'Sherlock', 'surname': 'Holmes',
+       *      'address': '221B Baker Street', 'enemies': [
+       *        {'firstname': 'James', 'surname': 'Moriarty'},
+       *        {'firstname': 'Irene', 'surname': 'Adler'}
+       *     ]}
+       *
+       * and you only want to filter your array based on the `surname` and `address`
+       * of your characters, you must set `filterBy` to:
+       *
+       *     ['surname', 'address'] or 'surname, address'
+       *
+       * If you wish to filter you characters based on the surnames
+       * of their antagonists, you must set this to :
+       *
+       *     ['enemies.surname'] or simply 'enemies.surname'
+       *
+       * If you wish to filter you characters based on all the fields
+       * of their antagonists, simply set `filterBy` to:
+       *
+       *     ['enemies'] or 'enemies'
+       *
+       * ***Notes :***
+       * - When filtering on subproperties, do not forget to set the `filterMaxDepth` to match.
+       * - If this is empty or `undefined`, the items in `arrayToFilter` will be filtered based
        * on **all** their properties.
-       * - If `arrayToFilter` is a flat array (eg of `String`), then changing this property
-       * will have no effect.
+       * - If `arrayToFilter` is a flat array (eg of `String`), then changing this will have no effect.
        * @type {Array|String}
        */
       filterBy: {
@@ -108,7 +122,7 @@
         value: function() {
           return [];
         },
-        observer: '_launchProcessArray'
+        observer: '_processArrayIfNewValUndefined'
       },
 
       /**
@@ -117,9 +131,9 @@
        *
        * Example:
        * If the items in `arrayToFilter` are objet like these :
-       *     
+       *
        *     {'lastname': 'foo',
-       *      'job': 
+       *      'job':
        *      {'title': 'bartender',
        *       'company':
        *       {'name': 'foobar',
@@ -127,7 +141,7 @@
        *       }
        *      }
        *     }
-       *     
+       *
        * and `filterMaxDepth` is set to `1`, the company's name and address
        * can never be inspected during filtering, but the job title can be.
        */
@@ -157,7 +171,7 @@
         value: function() {
           return [];
         },
-        observer: '_launchProcessArray'
+        observer: '_processArrayIfNewValUndefined'
       },
 
       /**
@@ -166,7 +180,7 @@
        * Example:
        * If the logical OR operator is set to 'or' and the `filter` is 'united ki or wede',
        * then a filtered country list will retain both 'United Kingdom' and 'Sweden'.
-       * 
+       *
        * **Important:**
        * This element uses regular expressions to match operator. Therefore, if you want
        * to use any character that is a special one in `RegEx` (for exemple the pipe),
@@ -185,7 +199,7 @@
        * The possible values are:
        * - `'contains'` (default) For each token `t` in the `filter` query, one or more token of a given item need to contain said token `t`.
        * - `'startsWith'`: For each token `t` in the `filter` query, one or more token of a given item need to start with said token `t`.
-       * - `'equals'` For each token `t` in the `filter` query, one or more token of a given item need to be equal to said token `t`.
+       * - `'equals'` For each token `t` in the `filter` query, one or more token of a given item need to be strictly equal to said token `t`.
        */
       filterMethod: {
         type: String,
@@ -239,11 +253,24 @@
     },
 
     _launchGenerateFilteredArray: function() {
-      this._generateFilteredArray(this._processedArray, this.filterMinLength, this.filterDebounceDelay, this.logicalOr, this.filterMethod, this._exactStringDelimiterRegExp);
+      this._generateFilteredArray(this._processedArray,
+        this.filterMinLength,
+        this.filterDebounceDelay,
+        this.logicalOr,
+        this.filterMethod,
+        this._exactStringDelimiterRegExp);
     },
 
-    _launchProcessArray: function() {
-      this._processArray({base: this.arrayToFilter}, {base: this.filterBy}, this.filterTokenizerRegExp, this.filterMaxDepth, {base: this.stopWords});
+    _processArrayIfNewValUndefined: function(newVal) {
+      // This observer is necessary only to launch the processing when an array
+      // is set to 'undefined'. 'array.*' observers do not register that.
+      if (typeof newVal === 'undefined') {
+        this._processArray({base: this.arrayToFilter},
+          {base: this.filterBy},
+          this.filterTokenizerRegExp,
+          this.filterMaxDepth,
+          {base: this.stopWords});
+      }
     },
 
     /**
@@ -281,7 +308,7 @@
             });
             // remove strings between quotes
             filterPart = filterPart.replace(this._exactStringDelimiterRegExp, '');
-            
+
             if (filterPart || exactStrings.length > 0) {
               filterPartsTokens.push({
                 values: exactStrings,
@@ -334,18 +361,21 @@
         if (!(filterMaxDepth > -1)) {
           throw 'filterMaxDepth (' + filterMaxDepth + ') must be a valid number >= 0';
         }
-        var filterBy = this._concat([], filterByChanges.base);
-        var stopWords = stopWordsChanges.base || [];
         if (typeof arrayToFilter === 'undefined' || arrayToFilter.length === 0) {
            // The array to filter is empty or undefined, nothing to pre-process
           this._set_processedArray([]);
         } else {
           var result = [], item, i = 0, length = arrayToFilter.length;
+          var filterByArray = typeof filterByChanges.base === 'string' ? filterByChanges.base.split(',').map(function(s){return s.trim();}) : filterByChanges.base;
           var process = function() {
             for (; i < length; i++) {
               item = arrayToFilter[i];
               if (item) {
-                result.push(this._processItem(item, filterBy, filterTokenizerRegExp, 0, filterMaxDepth, stopWords));
+                result.push(this._processItem(item, this._processFilterBy(this._concat([], filterByArray)),
+                  filterTokenizerRegExp,
+                  0,
+                  filterMaxDepth,
+                  stopWordsChanges.base || []));
               }
               if (i + 1 === length) {
                 // All items processed, set the result
@@ -362,11 +392,32 @@
     },
 
     /**
+     * Transform `filterBy` property of the component into an object
+     * with like such: {propToFilterBy: [descendantPropsToFilterBy], ...}
+     */
+    _processFilterBy: function(filterBy) {
+      var SEP = '.';
+      var propName, nextLevelProps;
+      return (filterBy || []).reduce(function(result, prop) {
+        if (prop.trim()) {
+          propName = prop.split(SEP)[0].trim();
+          nextLevelProps = prop.split(SEP).slice(1).join(SEP).trim();
+          if (nextLevelProps)
+            result[propName] = (result[propName] || []).concat(nextLevelProps);
+          else if (!result.hasOwnProperty(propName))
+            result[propName] = undefined;
+        }
+        return result;
+      }, {});
+    },
+
+    /**
      * Break specified item's properties into a flattened array of
      * normalized tokens without stop-words.
      */
     _processItem: function(item, filterBy, filterTokenizerRegExp, depth, filterMaxDepth, stopWords) {
       if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+        // Primitive types
         return {
           values: typeof item !== 'undefined' && item !== null ? [('' + item).toLowerCase()] : undefined,
           tokens: this._processValue(item, filterTokenizerRegExp, stopWords)
@@ -374,18 +425,22 @@
       } else {
         var flattenedItemTokensAndValues = {values: [], tokens: []};
         if (item) {
+          // Array
           if (item.constructor === Array) {
             for (var i = 0, l = item.length; i < l; i++) {
-              flattenedItemTokensAndValues = this._concatValuesAndTokens(flattenedItemTokensAndValues, this._processItem(item[i], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
+              flattenedItemTokensAndValues = this._concatValuesAndTokens(flattenedItemTokensAndValues,
+                this._processItem(item[i], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
             }
           }
+          // Objects
           else if (depth <= filterMaxDepth) {
-            var filterAllProps = !filterBy || !filterBy.length;
+            var filterAllProps = !filterBy || (function() {for(var p in filterBy){return false;} return true;})();
             for (var propName in item) {
-              if (!filterAllProps && filterBy.indexOf(propName) < 0) {
+              if (!filterAllProps && !filterBy.hasOwnProperty(propName)) {
                 continue;
               } else {
-                flattenedItemTokensAndValues = this._concatValuesAndTokens(flattenedItemTokensAndValues, this._processItem(item[propName], filterBy, filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
+                flattenedItemTokensAndValues = this._concatValuesAndTokens(flattenedItemTokensAndValues,
+                  this._processItem(item[propName], this._processFilterBy(filterBy[propName]), filterTokenizerRegExp, depth + 1, filterMaxDepth, stopWords));
               }
             }
           }
@@ -406,14 +461,13 @@
       var tokens = ('' + value).toLowerCase().split(filterTokenizerRegExp);
       // Processing token, removing empty ones and stop words
       var tt, me = this;
-      tokens = tokens.reduce(function(memo, t) {
+      return tokens.reduce(function(memo, t) {
         tt = me._processToken(t);
         if (tt && stopWords.indexOf(tt) < 0) {
           memo.push(tt);
         }
         return memo;
       }, []);
-      return tokens;
     },
 
     /**
