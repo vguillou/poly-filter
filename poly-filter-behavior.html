@@ -482,7 +482,7 @@
      */
     _concat: function(dest, values) {
       if (values) {
-        return dest.concat(values);
+        return dest.concat(typeof values === 'string' ? values.split(",") : values);
       }
       return dest;
     },
