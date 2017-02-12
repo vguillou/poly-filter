@@ -76,9 +76,9 @@
     }
   </style>
 </head>
-  
+
 <body unresolved>
-  
+
   <div class="main-container">
 
     <template is="dom-bind" id="demo">
@@ -99,7 +99,8 @@
         <poly-filter
           array-to-filter="[[dataset]]"
           filter="[[filterString]]"
-          filtered-array="{{filteredDataset}}">
+          filtered-array="{{filteredDataset}}"
+          batchNumber="20">
         </poly-filter>
 
         <div>
